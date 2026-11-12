@@ -54,9 +54,7 @@ def test_operator_level_event_without_journey(conn, world):
 def test_unknown_journey_is_rejected(conn, world):
     with pytest.raises(errors.ForeignKeyViolation):
         with conn.transaction():
-            record_event(
-                conn, operator_id=world["op"], journey_id=uuid.uuid4(), event_type="x"
-            )
+            record_event(conn, operator_id=world["op"], journey_id=uuid.uuid4(), event_type="x")
 
 
 def test_journey_of_another_operator_is_rejected(conn, world, tenants):

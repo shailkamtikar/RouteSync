@@ -18,7 +18,7 @@ USER1 = uuid.uuid4()
 
 @pytest.fixture
 def member_of_op1(monkeypatch):
-    def fake(user_id):
+    def fake(_conn, user_id):
         if user_id == USER1:
             return Membership(OP1, "Operator One", "active", "dispatcher")
         return None
@@ -110,7 +110,7 @@ def test_suspended_operator_is_403(client, monkeypatch):
     monkeypatch.setattr(
         membership,
         "fetch_membership",
-        lambda _: Membership(OP1, "Operator One", "suspended", "owner"),
+        lambda _conn, _user: Membership(OP1, "Operator One", "suspended", "owner"),
     )
     assert client.get("/api/v1/me", headers=auth(make_token(USER1))).status_code == 403
 
@@ -126,4 +126,3 @@ def test_client_supplied_operator_id_is_ignored(client, member_of_op1):
 
 def test_health_endpoints_stay_public(client):
     assert client.get("/healthz").status_code == 200
-
