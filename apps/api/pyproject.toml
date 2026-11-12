@@ -7,5 +7,5 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["live: calls a real external service; excluded from CI"]
-addopts = "-m \"not live\""
+markers = ["live: calls a real external service; excluded from CI", "db: runs against the dev database; run locally with -m db"]
+addopts = "-m \"not live and not db\""
