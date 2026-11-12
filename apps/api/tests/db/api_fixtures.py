@@ -20,7 +20,7 @@ class Api:
         return auth(make_token(self.tenants[who]))
 
     def call(self, method: str, path: str, who: str | None = "owner1", **kwargs):
-        headers = self.headers(who) if who else {}
+        headers = {**(self.headers(who) if who else {}), **kwargs.pop("headers", {})}
         return self.client.request(method, f"/api/v1{path}", headers=headers, **kwargs)
 
     def get(self, path, who="owner1", **kwargs):
