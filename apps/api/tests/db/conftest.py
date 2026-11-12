@@ -15,8 +15,8 @@ from dotenv import dotenv_values
 ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 
 
-@pytest.fixture
-def conn():
+@pytest.fixture(scope="session")
+def _connection():
     url = dotenv_values(ENV_FILE).get("DATABASE_URL")
     if not url:
         pytest.skip("DATABASE_URL not configured in apps/api/.env")
@@ -26,6 +26,13 @@ def conn():
     finally:
         connection.rollback()
         connection.close()
+
+
+@pytest.fixture
+def conn(_connection):
+    """One shared connection; each test runs in a savepoint that is always rolled back."""
+    with _connection.transaction(force_rollback=True):
+        yield _connection
 
 
 class Actor:
