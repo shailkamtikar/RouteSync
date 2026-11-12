@@ -11,6 +11,7 @@ export class ApiError extends Error {
     public readonly status: number,
     message: string,
     public readonly detail?: unknown,
+    public readonly details?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -25,12 +26,20 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   });
   if (!response.ok) {
     let detail: unknown;
+    let details: unknown;
     try {
-      detail = (await response.json()).detail;
+      const body = await response.json();
+      detail = body.detail;
+      details = body.details;
     } catch {
       detail = undefined;
     }
-    throw new ApiError(response.status, `Request failed with status ${response.status}`, detail);
+    throw new ApiError(
+      response.status,
+      `Request failed with status ${response.status}`,
+      detail,
+      details,
+    );
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
@@ -56,6 +65,19 @@ export async function authedRequest<T>(
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+/** Sends a raw text body (for example a CSV file) with the signed-in user's access token. */
+export async function authedUpload<T>(path: string, text: string, contentType: string): Promise<T> {
+  const {
+    data: { session },
+  } = await createClient().auth.getSession();
+  if (!session) throw new ApiError(401, "Not signed in");
+  return request<T>(path, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": contentType },
+    body: text,
   });
 }
 

@@ -21,7 +21,10 @@ from dotenv import dotenv_values
 ENV_FILE = Path(__file__).resolve().parents[1] / "apps" / "api" / ".env"
 
 OPERATORS = {
-    "Shivneri Travels": [("owner1@routesync.test", "owner"), ("dispatcher1@routesync.test", "dispatcher")],
+    "Shivneri Travels": [
+        ("owner1@routesync.test", "owner"),
+        ("dispatcher1@routesync.test", "dispatcher"),
+    ],
     "Deccan Express": [("owner2@routesync.test", "owner")],
 }
 
@@ -31,7 +34,9 @@ def load_env() -> dict[str, str]:
     if not env.get("SEED_USER_PASSWORD"):
         env["SEED_USER_PASSWORD"] = secrets.token_urlsafe(18)
         with ENV_FILE.open("a", encoding="utf-8") as fh:
-            fh.write(f"\n# Password shared by the seeded test users\nSEED_USER_PASSWORD={env['SEED_USER_PASSWORD']}\n")
+            fh.write(
+                f"\n# Password shared by the seeded test users\nSEED_USER_PASSWORD={env['SEED_USER_PASSWORD']}\n"
+            )
     return env
 
 
@@ -63,10 +68,16 @@ def main() -> None:
     env = load_env()
     with psycopg.connect(env["DATABASE_URL"], connect_timeout=15) as conn:
         for name, members in OPERATORS.items():
-            row = conn.execute("select id from public.operators where name = %s", (name,)).fetchone()
-            operator_id = row[0] if row else conn.execute(
-                "insert into public.operators (name) values (%s) returning id", (name,)
-            ).fetchone()[0]
+            row = conn.execute(
+                "select id from public.operators where name = %s", (name,)
+            ).fetchone()
+            operator_id = (
+                row[0]
+                if row
+                else conn.execute(
+                    "insert into public.operators (name) values (%s) returning id", (name,)
+                ).fetchone()[0]
+            )
             for email, role in members:
                 user_id = ensure_user(env, conn, email)
                 conn.execute(

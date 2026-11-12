@@ -54,7 +54,9 @@ for email, (operator, role) in EXPECTED.items():
     status, me = call(f"{API}/api/v1/me", headers={"Authorization": f"Bearer {token}"})
     ok = status == 200 and me.get("operator_name") == operator and me.get("role") == role
     failures += not ok
-    print(f"{'PASS' if ok else 'FAIL'} {email}: HTTP {status} {me.get('operator_name')} {me.get('role')}")
+    print(
+        f"{'PASS' if ok else 'FAIL'} {email}: HTTP {status} {me.get('operator_name')} {me.get('role')}"
+    )
 
 status, _ = call(f"{API}/api/v1/me", headers={})
 print(f"{'PASS' if status == 401 else 'FAIL'} no token: HTTP {status}")
