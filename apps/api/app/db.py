@@ -1,7 +1,11 @@
 """Postgres connection pool."""
 
 import logging
+from collections.abc import Iterator
+from typing import Annotated
 
+import psycopg
+from fastapi import Depends
 from psycopg_pool import ConnectionPool
 
 from app.config import get_settings
@@ -40,3 +44,12 @@ def check_db() -> bool:
     except Exception:
         logger.warning("database readiness check failed")
         return False
+
+
+def get_conn() -> Iterator[psycopg.Connection]:
+    """Request-scoped connection: commits when the request succeeds, rolls back on error."""
+    with get_pool().connection() as conn:
+        yield conn
+
+
+DbConn = Annotated[psycopg.Connection, Depends(get_conn)]

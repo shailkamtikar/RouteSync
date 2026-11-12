@@ -10,9 +10,13 @@ from app.main import app  # noqa: E402
 
 
 @pytest.fixture
-def client() -> TestClient:
+def client():
     # No context manager: lifespan (and the real DB pool) is not started in unit tests.
-    return TestClient(app)
+    from app.db import get_conn
+
+    app.dependency_overrides[get_conn] = lambda: None
+    yield TestClient(app)
+    app.dependency_overrides.pop(get_conn, None)
 
 
 @pytest.fixture(autouse=True)
@@ -23,3 +27,6 @@ def _test_signing_key(monkeypatch):
     from .auth_helpers import TEST_KEY
 
     monkeypatch.setattr(jwt_module, "resolve_signing_key", lambda _token: TEST_KEY.public_key())
+
+
+pytest_plugins = ["tests.db.api_fixtures"]

@@ -7,10 +7,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app import db
-from app.api.v1 import health, me
+from app.api.v1 import buses, health, me, services
 from app.config import get_settings
+from app.domain.errors import DomainError
 from app.logging import configure_logging, request_id_var
 
 logger = logging.getLogger("routesync.api")
@@ -60,9 +62,17 @@ def create_app() -> FastAPI:
         finally:
             request_id_var.reset(token)
 
+    @app.exception_handler(DomainError)
+    async def domain_error_handler(_: Request, exc: DomainError) -> JSONResponse:
+        body: dict = {"detail": exc.message, "code": exc.code}
+        if exc.details is not None:
+            body["details"] = exc.details
+        return JSONResponse(body, status_code=exc.status_code)
+
     app.include_router(health.router)
     v1 = APIRouter(prefix="/api/v1")
-    v1.include_router(me.router)
+    for module in (me, buses, services):
+        v1.include_router(module.router)
     app.include_router(v1)
     return app
 

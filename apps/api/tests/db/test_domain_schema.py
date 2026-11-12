@@ -323,4 +323,3 @@ def test_active_stop_needs_passenger_activity(conn, actor, worlds):
         "values (%s, %s, %s, %s, 2, 0, 0)",
         (w1["op"], w1["journey"], w1["template"], w1["stop_b"]),
     )
-

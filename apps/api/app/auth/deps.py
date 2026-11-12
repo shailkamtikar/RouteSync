@@ -12,6 +12,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.auth.jwt import InvalidToken, TokenUser, verify_access_token
+from app.db import DbConn
 from app.domain import membership
 
 _bearer = HTTPBearer(auto_error=False)
@@ -48,8 +49,9 @@ def get_current_user(
 
 def get_operator_context(
     user: Annotated[TokenUser, Depends(get_current_user)],
+    conn: DbConn,
 ) -> OperatorContext:
-    found = membership.fetch_membership(user.user_id)
+    found = membership.fetch_membership(conn, user.user_id)
     if found is None or found.operator_status != "active":
         raise HTTPException(status.HTTP_403_FORBIDDEN, "No active operator membership")
     return OperatorContext(
