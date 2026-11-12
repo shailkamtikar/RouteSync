@@ -34,9 +34,8 @@ def load_env() -> dict[str, str]:
     if not env.get("SEED_USER_PASSWORD"):
         env["SEED_USER_PASSWORD"] = secrets.token_urlsafe(18)
         with ENV_FILE.open("a", encoding="utf-8") as fh:
-            fh.write(
-                f"\n# Password shared by the seeded test users\nSEED_USER_PASSWORD={env['SEED_USER_PASSWORD']}\n"
-            )
+            fh.write("\n# Password shared by the seeded test users\n")
+            fh.write(f"SEED_USER_PASSWORD={env['SEED_USER_PASSWORD']}\n")
     return env
 
 
