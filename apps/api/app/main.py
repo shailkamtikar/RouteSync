@@ -9,7 +9,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import db
-from app.api.v1 import health
+from app.api.v1 import health, me
 from app.config import get_settings
 from app.logging import configure_logging, request_id_var
 
@@ -61,7 +61,9 @@ def create_app() -> FastAPI:
             request_id_var.reset(token)
 
     app.include_router(health.router)
-    app.include_router(APIRouter(prefix="/api/v1"))
+    v1 = APIRouter(prefix="/api/v1")
+    v1.include_router(me.router)
+    app.include_router(v1)
     return app
 
 
