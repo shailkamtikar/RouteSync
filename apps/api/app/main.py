@@ -10,7 +10,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app import db
-from app.api.v1 import buses, health, journeys, me, routing, services
+from app.api.v1 import (
+    buses,
+    health,
+    journeys,
+    me,
+    route_templates,
+    routing,
+    services,
+)
 from app.config import get_settings
 from app.domain.errors import DomainError
 from app.logging import configure_logging, request_id_var
@@ -91,7 +99,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     v1 = APIRouter(prefix="/api/v1")
-    for module in (me, buses, services, journeys, routing):
+    for module in (me, buses, services, journeys, routing, route_templates):
         v1.include_router(module.router)
     app.include_router(v1)
     return app
