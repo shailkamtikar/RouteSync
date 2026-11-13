@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     delay_alert_clear_margin_min: float = Field(default=5.0, ge=0)
     arrival_buffer_min: float = Field(default=0.0, ge=0)
 
+    # Public tracking links and public endpoint limits.
+    tracking_link_hours_after_arrival: float = Field(default=24.0, ge=0)
+    public_rate_per_min_ip: int = Field(default=120, gt=0)
+    public_rate_per_min_token: int = Field(default=60, gt=0)
+
     # Rerouting guardrails. These are tuning values, not product rules.
     reroute_autoapply: bool = True
     reroute_min_saving_minutes: float = Field(default=10.0, ge=0)
