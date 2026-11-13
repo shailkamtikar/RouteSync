@@ -10,8 +10,9 @@ from psycopg.types.json import Jsonb
 
 from app.auth.deps import OperatorContext
 from app.config import get_settings
-from app.domain import journeys
+from app.domain import alerts, journeys
 from app.domain.errors import Conflict
+from app.eta import commitment as cm
 from app.eta.engine import EtaConfig, EtaInput, EtaSnapshot, EtaStop, compute_snapshot
 
 # A snapshot younger than this is reused, so polling screens do not create a row per request.
@@ -91,6 +92,7 @@ def persist_snapshot(
     ctx: OperatorContext,
     journey_id: uuid.UUID,
     snapshot: EtaSnapshot,
+    payload: dict[str, Any] | None = None,
 ) -> uuid.UUID:
     return conn.execute(
         "insert into public.journey_eta_snapshots (operator_id, journey_id, route_version_id, "
@@ -103,7 +105,7 @@ def persist_snapshot(
             snapshot.computed_at,
             snapshot.next_stop.eta,
             snapshot.destination.eta,
-            Jsonb(snapshot.to_payload()),
+            Jsonb(payload if payload is not None else snapshot.to_payload()),
         ),
     ).fetchone()[0]
 
@@ -143,5 +145,11 @@ def current_snapshot(
     ):
         return latest["payload"]
     snapshot = compute_snapshot(data)
-    persist_snapshot(conn, ctx, journey_id, snapshot)
-    return snapshot.to_payload()
+    journey = journeys.get_journey(conn, ctx, journey_id)
+    config = get_settings().commitment_config()
+    result = cm.assess(journey["booking_eta_at"], snapshot.destination.eta, config)
+    payload = snapshot.to_payload()
+    payload["commitment"] = result.to_payload()
+    persist_snapshot(conn, ctx, journey_id, snapshot, payload)
+    alerts.sync_delay_alert(conn, ctx, journey_id, journey["status"], result, config)
+    return payload
