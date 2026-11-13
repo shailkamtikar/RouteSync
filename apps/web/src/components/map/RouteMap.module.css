@@ -1,0 +1,38 @@
+.frame {
+  position: relative;
+  width: 100%;
+  border: 1px solid #8883;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  border: 1px dashed #8886;
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+.bus {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #dc2626;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 2px #dc2626, 0 2px 6px #0006;
+}
+
+.busStale {
+  background: #9ca3af;
+  box-shadow: 0 0 0 2px #9ca3af, 0 2px 6px #0006;
+  opacity: 0.85;
+}

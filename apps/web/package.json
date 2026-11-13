@@ -9,11 +9,14 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "predev": "node scripts/copy-map-worker.mjs",
+    "prebuild": "node scripts/copy-map-worker.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
+    "maplibre-gl": "^6.18.0",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
