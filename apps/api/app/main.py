@@ -17,6 +17,7 @@ from app.api.v1 import (
     ingest,
     journeys,
     me,
+    monitor,
     planning,
     reroute,
     route_templates,
@@ -118,6 +119,7 @@ def create_app() -> FastAPI:
         stop_events,
         traffic,
         reroute,
+        monitor,
     ):
         v1.include_router(module.router)
     app.include_router(v1)

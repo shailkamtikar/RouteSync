@@ -1,5 +1,6 @@
 """Verification of Supabase-issued access tokens (asymmetric keys published as JWKS)."""
 
+import time
 import uuid
 from dataclasses import dataclass
 from functools import lru_cache
@@ -34,9 +35,37 @@ def _jwks_client() -> PyJWKClient:
     )
 
 
+_known_keys: dict[str, object] = {}
+
+
 def resolve_signing_key(token: str):
-    """Return the public key for this token. Replaced in unit tests."""
-    return _jwks_client().get_signing_key_from_jwt(token).key
+    """Return the public key for this token. Replaced in unit tests.
+
+    Keys already seen are remembered, so a brief failure to reach the key endpoint does not
+    sign every user out. An unknown key id is always looked up; it is never trusted blindly.
+    """
+    try:
+        kid = jwt.get_unverified_header(token).get("kid")
+    except jwt.PyJWTError:
+        kid = None
+    last_error: Exception | None = None
+    for attempt in range(2):
+        try:
+            key = _jwks_client().get_signing_key_from_jwt(token).key
+            if kid:
+                _known_keys[kid] = key
+            return key
+        except jwt.exceptions.PyJWKClientConnectionError as exc:
+            last_error = exc
+            if attempt == 0:
+                time.sleep(0.3)
+    if kid and kid in _known_keys:
+        return _known_keys[kid]
+    raise last_error  # type: ignore[misc]
+
+
+# The real resolver, kept under a second name because tests replace `resolve_signing_key`.
+default_resolve_signing_key = resolve_signing_key
 
 
 def verify_access_token(token: str) -> TokenUser:

@@ -21,3 +21,6 @@ supabase/.temp
 # Misc
 *.log
 .DS_Store
+
+# demo journey details (contain device tokens)
+demo*.json
