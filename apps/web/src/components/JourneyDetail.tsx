@@ -6,6 +6,7 @@ import { formatInZone } from "@/lib/time";
 import { useResource } from "@/lib/useResource";
 
 import { BookingsPanel } from "./BookingsPanel";
+import { JourneyPlanPanel } from "./JourneyPlanPanel";
 import { JourneyRoutePanel } from "./JourneyRoutePanel";
 import type { Journey } from "./JourneysPanel";
 import ui from "./ui.module.css";
@@ -69,6 +70,7 @@ export function JourneyDetail({ journeyId }: { journeyId: string }) {
         editable={PRE_DEPARTURE.includes(journey.status)}
         onChanged={reload}
       />
+      <JourneyPlanPanel journey={journey} onChanged={reload} />
     </div>
   );
 }

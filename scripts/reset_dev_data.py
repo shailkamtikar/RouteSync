@@ -14,7 +14,7 @@ import psycopg
 from dotenv import dotenv_values
 
 ENV_FILE = Path(__file__).resolve().parents[1] / "apps" / "api" / ".env"
-KEEP = {"operators", "operator_members"}
+KEEP = {"operators", "operator_members", "routing_cache", "places_cache"}
 
 
 def main() -> None:
