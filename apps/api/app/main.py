@@ -10,10 +10,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app import db
-from app.api.v1 import buses, health, journeys, me, services
+from app.api.v1 import buses, health, journeys, me, routing, services
 from app.config import get_settings
 from app.domain.errors import DomainError
 from app.logging import configure_logging, request_id_var
+from app.providers.routing.base import (
+    RoutingError,
+    RoutingInvalidRequest,
+    RoutingQuotaExceeded,
+)
 
 logger = logging.getLogger("routesync.api")
 
@@ -69,9 +74,24 @@ def create_app() -> FastAPI:
             body["details"] = exc.details
         return JSONResponse(body, status_code=exc.status_code)
 
+    @app.exception_handler(RoutingError)
+    async def routing_error_handler(_: Request, exc: RoutingError) -> JSONResponse:
+        if isinstance(exc, RoutingInvalidRequest):
+            return JSONResponse({"detail": str(exc), "code": "routing_invalid"}, status_code=422)
+        code = (
+            "routing_quota_exceeded"
+            if isinstance(exc, RoutingQuotaExceeded)
+            else "routing_unavailable"
+        )
+        logger.warning("routing failure: %s", code)
+        return JSONResponse(
+            {"detail": "Route calculation is temporarily unavailable.", "code": code},
+            status_code=503,
+        )
+
     app.include_router(health.router)
     v1 = APIRouter(prefix="/api/v1")
-    for module in (me, buses, services, journeys):
+    for module in (me, buses, services, journeys, routing):
         v1.include_router(module.router)
     app.include_router(v1)
     return app
