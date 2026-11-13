@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     delay_alert_clear_margin_min: float = Field(default=5.0, ge=0)
     arrival_buffer_min: float = Field(default=0.0, ge=0)
 
+    # RouteSync Companion (assistant). The key is server-side only.
+    companion_enabled: bool = True
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-3.5-flash-lite"
+    companion_rate_per_min_link: int = Field(default=10, gt=0)
+    companion_rate_per_day_link: int = Field(default=200, gt=0)
+
     # Public tracking links and public endpoint limits.
     tracking_link_hours_after_arrival: float = Field(default=24.0, ge=0)
     public_rate_per_min_ip: int = Field(default=120, gt=0)
