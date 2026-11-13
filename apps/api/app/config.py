@@ -37,6 +37,15 @@ class Settings(BaseSettings):
     delay_alert_clear_margin_min: float = Field(default=5.0, ge=0)
     arrival_buffer_min: float = Field(default=0.0, ge=0)
 
+    # Rerouting guardrails. These are tuning values, not product rules.
+    reroute_autoapply: bool = True
+    reroute_min_saving_minutes: float = Field(default=10.0, ge=0)
+    reroute_min_saving_pct: float = Field(default=5.0, ge=0)
+    reroute_cooldown_minutes: float = Field(default=20.0, ge=0)
+    reroute_max_per_journey: int = Field(default=3, ge=0)
+    reroute_confirmations: int = Field(default=2, ge=1)
+    reroute_eval_interval_s: float = Field(default=30.0, ge=0)
+
     # Route scoring weights and cost estimates (see app.optimizer). All must be >= 0.
     score_weight_lateness_per_min: float = Field(default=10.0, ge=0)
     score_weight_travel_per_min: float = Field(default=1.0, ge=0)
@@ -57,6 +66,18 @@ class Settings(BaseSettings):
             cost_per_unit=self.score_weight_cost_per_unit,
             distance_per_km=self.score_weight_distance_per_km,
             risk_per_min=self.score_weight_risk_per_min,
+        )
+
+    def reroute_config(self):
+        from app.optimizer.decision import DecisionConfig
+
+        return DecisionConfig(
+            min_saving_minutes=self.reroute_min_saving_minutes,
+            min_saving_pct=self.reroute_min_saving_pct,
+            cooldown_minutes=self.reroute_cooldown_minutes,
+            max_reroutes_per_journey=self.reroute_max_per_journey,
+            confirmations_required=self.reroute_confirmations,
+            autoapply=self.reroute_autoapply,
         )
 
     def commitment_config(self):

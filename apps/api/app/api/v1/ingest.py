@@ -11,7 +11,8 @@ from app.auth.deps import CurrentOperator
 from app.auth.rate_limit import RateLimiter
 from app.config import get_settings
 from app.db import DbConn
-from app.domain import gps
+from app.domain import gps, reroute
+from app.domain.routing import Routing
 from app.schemas.live import DeviceRouteOut, GpsBatchIn, GpsIngestResult, IngestTokenOut
 
 router = APIRouter(tags=["ingest"])
@@ -45,12 +46,10 @@ Device = Annotated[gps.IngestJourney, Depends(device_journey)]
 
 
 @router.post("/ingest/gps", response_model=GpsIngestResult, status_code=status.HTTP_202_ACCEPTED)
-def ingest_gps(data: GpsBatchIn, device: Device, conn: DbConn):
+def ingest_gps(data: GpsBatchIn, device: Device, conn: DbConn, provider: Routing):
     result = gps.ingest_points(conn, device, data.points)
     if result["accepted"]:
-        from app.domain import reroute
-
-        reroute.after_position_update(conn, device)
+        reroute.after_position_update(conn, device, provider)
     return result
 
 
