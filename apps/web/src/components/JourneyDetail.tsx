@@ -59,6 +59,11 @@ export function JourneyDetail({ journeyId }: { journeyId: string }) {
           </dd>
         </div>
       </dl>
+      {journey.status !== "draft" && journey.status !== "awaiting_confirmation" && (
+        <p>
+          <Link href={`/dashboard/journeys/${journey.id}/monitor`}>Open live monitor</Link>
+        </p>
+      )}
       {journey.plan_needs_review && (
         <p className={ui.error} role="status">
           Bookings changed after the stop plan was confirmed. Review the stop plan.

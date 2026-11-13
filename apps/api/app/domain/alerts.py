@@ -67,3 +67,38 @@ def sync_delay_alert(
             payload={"delay_minutes": round(result.delay_minutes, 1)},
         )
     return action
+
+
+def sync_flag_alert(
+    conn: psycopg.Connection,
+    ctx: OperatorContext,
+    journey_id: uuid.UUID,
+    journey_status: str,
+    alert_type: str,
+    active: bool,
+    severity: str,
+    message: str,
+) -> str:
+    """Keep one open alert of `alert_type` while a condition holds; resolve it when it ends."""
+    if journey_status not in ALERTING_STATUSES:
+        return "none"
+    open_alert = conn.execute(
+        "select id from public.journey_alerts "
+        "where journey_id = %s and operator_id = %s and type = %s and resolved_at is null "
+        "for update",
+        (journey_id, ctx.operator_id, alert_type),
+    ).fetchone()
+    if active and open_alert is None:
+        conn.execute(
+            "insert into public.journey_alerts (operator_id, journey_id, type, severity, message, "
+            "is_public) values (%s, %s, %s, %s, %s, true) "
+            "on conflict (journey_id, type) where resolved_at is null do nothing",
+            (ctx.operator_id, journey_id, alert_type, severity, message),
+        )
+        return "open"
+    if not active and open_alert is not None:
+        conn.execute(
+            "update public.journey_alerts set resolved_at = now() where id = %s", (open_alert[0],)
+        )
+        return "resolve"
+    return "none"

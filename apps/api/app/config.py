@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     log_level: str = "INFO"
 
+    # Secret mixed into stored token hashes (device tokens, public tracking links).
+    public_token_pepper: str = ""
+
+    # GPS ingestion: fastest plausible bus speed, allowed device clock skew, requests per minute.
+    gps_max_speed_kmh: float = Field(default=160.0, gt=0)
+    gps_future_tolerance_s: float = Field(default=60.0, ge=0)
+    ingest_rate_per_min: int = Field(default=120, gt=0)
+
     # ETA: a position older than this is shown as not live; farther than this from the route is off route.
     gps_stale_after_s: float = Field(default=120.0, gt=0)
     off_route_m: float = Field(default=1000.0, gt=0)
@@ -28,6 +36,15 @@ class Settings(BaseSettings):
     delay_critical_after_min: float = Field(default=60.0, gt=0)
     delay_alert_clear_margin_min: float = Field(default=5.0, ge=0)
     arrival_buffer_min: float = Field(default=0.0, ge=0)
+
+    # Rerouting guardrails. These are tuning values, not product rules.
+    reroute_autoapply: bool = True
+    reroute_min_saving_minutes: float = Field(default=10.0, ge=0)
+    reroute_min_saving_pct: float = Field(default=5.0, ge=0)
+    reroute_cooldown_minutes: float = Field(default=20.0, ge=0)
+    reroute_max_per_journey: int = Field(default=3, ge=0)
+    reroute_confirmations: int = Field(default=2, ge=1)
+    reroute_eval_interval_s: float = Field(default=30.0, ge=0)
 
     # Route scoring weights and cost estimates (see app.optimizer). All must be >= 0.
     score_weight_lateness_per_min: float = Field(default=10.0, ge=0)
@@ -49,6 +66,18 @@ class Settings(BaseSettings):
             cost_per_unit=self.score_weight_cost_per_unit,
             distance_per_km=self.score_weight_distance_per_km,
             risk_per_min=self.score_weight_risk_per_min,
+        )
+
+    def reroute_config(self):
+        from app.optimizer.decision import DecisionConfig
+
+        return DecisionConfig(
+            min_saving_minutes=self.reroute_min_saving_minutes,
+            min_saving_pct=self.reroute_min_saving_pct,
+            cooldown_minutes=self.reroute_cooldown_minutes,
+            max_reroutes_per_journey=self.reroute_max_per_journey,
+            confirmations_required=self.reroute_confirmations,
+            autoapply=self.reroute_autoapply,
         )
 
     def commitment_config(self):

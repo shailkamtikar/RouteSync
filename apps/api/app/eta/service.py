@@ -11,9 +11,11 @@ from psycopg.types.json import Jsonb
 from app.auth.deps import OperatorContext
 from app.config import get_settings
 from app.domain import alerts, journeys
+from app.domain import traffic as traffic_domain
 from app.domain.errors import Conflict
 from app.eta import commitment as cm
 from app.eta.engine import EtaConfig, EtaInput, EtaSnapshot, EtaStop, compute_snapshot
+from app.eta.traffic import traffic_on_route
 
 # A snapshot younger than this is reused, so polling screens do not create a row per request.
 DEFAULT_MAX_AGE_S = 5.0
@@ -58,9 +60,19 @@ def load_input(
     route = tuple((c[0], c[1]) for c in version["coordinates"])
     settings = get_settings()
     has_position = position["lng"] is not None
+    clock = now or datetime.now(UTC)
+    on_route = traffic_on_route(
+        route,
+        traffic_domain.incidents_for_template(conn, ctx.operator_id, journey["route_template_id"])
+        if journey["route_template_id"]
+        else [],
+        traffic_domain.database_now(conn),
+    )
     return EtaInput(
-        now=now or datetime.now(UTC),
+        now=clock,
         route=route,
+        traffic=on_route.segments,
+        closures=on_route.closures,
         route_distance_m=float(version["distance_m"]),
         route_duration_s=float(version["duration_s"]),
         stops=tuple(
@@ -152,4 +164,24 @@ def current_snapshot(
     payload["commitment"] = result.to_payload()
     persist_snapshot(conn, ctx, journey_id, snapshot, payload)
     alerts.sync_delay_alert(conn, ctx, journey_id, journey["status"], result, config)
+    alerts.sync_flag_alert(
+        conn,
+        ctx,
+        journey_id,
+        journey["status"],
+        "traffic",
+        snapshot.flags.get("traffic_ahead", False),
+        "info",
+        "Simulated slow traffic ahead on the route.",
+    )
+    alerts.sync_flag_alert(
+        conn,
+        ctx,
+        journey_id,
+        journey["status"],
+        "road_closure",
+        snapshot.flags.get("closure_ahead", False),
+        "critical",
+        "Simulated road closure ahead on the route.",
+    )
     return payload

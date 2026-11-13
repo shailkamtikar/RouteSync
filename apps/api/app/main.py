@@ -14,12 +14,17 @@ from app.api.v1 import (
     buses,
     eta,
     health,
+    ingest,
     journeys,
     me,
+    monitor,
     planning,
+    reroute,
     route_templates,
     routing,
     services,
+    stop_events,
+    traffic,
 )
 from app.config import get_settings
 from app.domain.errors import DomainError
@@ -101,7 +106,21 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     v1 = APIRouter(prefix="/api/v1")
-    for module in (me, buses, services, journeys, routing, route_templates, planning, eta):
+    for module in (
+        me,
+        buses,
+        services,
+        journeys,
+        routing,
+        route_templates,
+        planning,
+        eta,
+        ingest,
+        stop_events,
+        traffic,
+        reroute,
+        monitor,
+    ):
         v1.include_router(module.router)
     app.include_router(v1)
     return app

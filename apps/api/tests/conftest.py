@@ -2,6 +2,7 @@ import os
 
 os.environ["DATABASE_URL"] = "postgresql://test:test@127.0.0.1:1/test"
 os.environ["SUPABASE_URL"] = "https://test-project.supabase.co"
+os.environ["PUBLIC_TOKEN_PEPPER"] = "unit-test-pepper"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

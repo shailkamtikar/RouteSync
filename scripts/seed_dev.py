@@ -40,14 +40,20 @@ def load_env() -> dict[str, str]:
 
 
 def ensure_user(env: dict[str, str], conn: psycopg.Connection, email: str) -> str:
-    row = conn.execute("select id from auth.users where email = %s", (email,)).fetchone()
+    row = conn.execute(
+        "select id from auth.users where email = %s", (email,)
+    ).fetchone()
     if row:
         return str(row[0])
     key = env["SUPABASE_SERVICE_ROLE_KEY"]
     request = urllib.request.Request(
         f"{env['SUPABASE_URL'].rstrip('/')}/auth/v1/admin/users",
         data=json.dumps(
-            {"email": email, "password": env["SEED_USER_PASSWORD"], "email_confirm": True}
+            {
+                "email": email,
+                "password": env["SEED_USER_PASSWORD"],
+                "email_confirm": True,
+            }
         ).encode(),
         headers={
             "apikey": key,
@@ -74,7 +80,8 @@ def main() -> None:
                 row[0]
                 if row
                 else conn.execute(
-                    "insert into public.operators (name) values (%s) returning id", (name,)
+                    "insert into public.operators (name) values (%s) returning id",
+                    (name,),
                 ).fetchone()[0]
             )
             for email, role in members:
