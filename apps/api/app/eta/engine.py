@@ -65,6 +65,8 @@ class EtaInput:
     position: LngLat | None = None
     position_at: datetime | None = None
     traffic: tuple[TrafficSegment, ...] = ()
+    # Closed stretches of this route, as (from_m, to_m) in route chainage.
+    closures: tuple[tuple[float, float], ...] = ()
     route_version_id: str | None = None
     config: EtaConfig = field(default_factory=EtaConfig)
 
@@ -188,6 +190,26 @@ def compute_snapshot(data: EtaInput) -> EtaSnapshot:
                 warnings.append(
                     {"code": "GPS_STALE", "message": "The last known position is not recent."}
                 )
+
+    # ---- traffic still ahead of the bus
+    simulated = flags["traffic_simulated"] or bool(data.closures)
+    flags["traffic_ahead"] = any(segment.to_m > position_m for segment in data.traffic)
+    flags["closure_ahead"] = any(end > position_m for _, end in data.closures)
+    if flags["traffic_ahead"]:
+        message = (
+            "Simulated slow traffic ahead on the route."
+            if simulated
+            else "Slow traffic ahead on the route."
+        )
+        warnings.append({"code": "TRAFFIC_AHEAD", "message": message})
+    if flags["closure_ahead"]:
+        prefix = "Simulated road closure" if simulated else "Road closure"
+        warnings.append(
+            {
+                "code": "ROAD_CLOSED_AHEAD",
+                "message": f"{prefix} ahead. Arrival times are uncertain.",
+            }
+        )
 
     # ---- walk the stops in order
     chainages = []

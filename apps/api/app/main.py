@@ -22,6 +22,7 @@ from app.api.v1 import (
     routing,
     services,
     stop_events,
+    traffic,
 )
 from app.config import get_settings
 from app.domain.errors import DomainError
@@ -114,6 +115,7 @@ def create_app() -> FastAPI:
         eta,
         ingest,
         stop_events,
+        traffic,
     ):
         v1.include_router(module.router)
     app.include_router(v1)
