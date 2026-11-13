@@ -7,6 +7,7 @@ import { useResource } from "@/lib/useResource";
 
 import { BookingsPanel } from "./BookingsPanel";
 import { JourneyPlanPanel } from "./JourneyPlanPanel";
+import { TrackingLinkPanel } from "./TrackingLinkPanel";
 import { JourneyRoutePanel } from "./JourneyRoutePanel";
 import type { Journey } from "./JourneysPanel";
 import ui from "./ui.module.css";
@@ -76,6 +77,7 @@ export function JourneyDetail({ journeyId }: { journeyId: string }) {
         onChanged={reload}
       />
       <JourneyPlanPanel journey={journey} onChanged={reload} />
+      <TrackingLinkPanel journey={journey} onChanged={reload} />
     </div>
   );
 }
