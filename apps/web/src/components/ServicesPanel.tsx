@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
 import { authedRequest } from "@/lib/api";
@@ -132,7 +133,8 @@ export function ServicesPanel() {
                   </td>
                   <td>{formatPoint(service.origin_location)}</td>
                   <td>{formatPoint(service.destination_location)}</td>
-                  <td>
+                  <td className={ui.row}>
+                    <Link href={`/dashboard/services/${service.id}`}>Route options</Link>
                     <button
                       className={ui.buttonDanger}
                       type="button"

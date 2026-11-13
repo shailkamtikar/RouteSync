@@ -6,6 +6,7 @@ import { formatInZone } from "@/lib/time";
 import { useResource } from "@/lib/useResource";
 
 import { BookingsPanel } from "./BookingsPanel";
+import { JourneyRoutePanel } from "./JourneyRoutePanel";
 import type { Journey } from "./JourneysPanel";
 import ui from "./ui.module.css";
 
@@ -62,6 +63,7 @@ export function JourneyDetail({ journeyId }: { journeyId: string }) {
           Bookings changed after the stop plan was confirmed. Review the stop plan.
         </p>
       )}
+      <JourneyRoutePanel journey={journey} onChanged={reload} />
       <BookingsPanel
         journeyId={journey.id}
         editable={PRE_DEPARTURE.includes(journey.status)}
