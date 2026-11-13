@@ -52,15 +52,21 @@ failures = 0
 for email, (operator, role) in EXPECTED.items():
     token = sign_in(email)
     status, me = call(f"{API}/api/v1/me", headers={"Authorization": f"Bearer {token}"})
-    ok = status == 200 and me.get("operator_name") == operator and me.get("role") == role
+    ok = (
+        status == 200 and me.get("operator_name") == operator and me.get("role") == role
+    )
     failures += not ok
     verdict = "PASS" if ok else "FAIL"
-    print(f"{verdict} {email}: HTTP {status} {me.get('operator_name')} {me.get('role')}")
+    print(
+        f"{verdict} {email}: HTTP {status} {me.get('operator_name')} {me.get('role')}"
+    )
 
 status, _ = call(f"{API}/api/v1/me", headers={})
 print(f"{'PASS' if status == 401 else 'FAIL'} no token: HTTP {status}")
 failures += status != 401
-status, _ = call(f"{API}/api/v1/me", headers={"Authorization": "Bearer " + token[:-4] + "AAAA"})
+status, _ = call(
+    f"{API}/api/v1/me", headers={"Authorization": "Bearer " + token[:-4] + "AAAA"}
+)
 print(f"{'PASS' if status == 401 else 'FAIL'} tampered signature: HTTP {status}")
 failures += status != 401
 sys.exit(1 if failures else 0)

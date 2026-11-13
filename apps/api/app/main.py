@@ -14,6 +14,7 @@ from app.api.v1 import (
     buses,
     eta,
     health,
+    ingest,
     journeys,
     me,
     planning,
@@ -101,7 +102,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     v1 = APIRouter(prefix="/api/v1")
-    for module in (me, buses, services, journeys, routing, route_templates, planning, eta):
+    for module in (me, buses, services, journeys, routing, route_templates, planning, eta, ingest):
         v1.include_router(module.router)
     app.include_router(v1)
     return app

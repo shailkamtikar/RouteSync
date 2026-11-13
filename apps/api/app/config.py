@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     log_level: str = "INFO"
 
+    # Secret mixed into stored token hashes (device tokens, public tracking links).
+    public_token_pepper: str = ""
+
+    # GPS ingestion: fastest plausible bus speed, allowed device clock skew, requests per minute.
+    gps_max_speed_kmh: float = Field(default=160.0, gt=0)
+    gps_future_tolerance_s: float = Field(default=60.0, ge=0)
+    ingest_rate_per_min: int = Field(default=120, gt=0)
+
     # ETA: a position older than this is shown as not live; farther than this from the route is off route.
     gps_stale_after_s: float = Field(default=120.0, gt=0)
     off_route_m: float = Field(default=1000.0, gt=0)
