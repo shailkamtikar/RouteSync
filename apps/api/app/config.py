@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     database_url: str
     supabase_url: str = ""
     supabase_service_role_key: str = ""
+    ors_api_key: str = ""
+    # Half-width of a route option's corridor: stops and reroutes must stay within it.
+    corridor_width_m: int = 5000
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     log_level: str = "INFO"
 
