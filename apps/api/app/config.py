@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     log_level: str = "INFO"
 
+    # ETA: a position older than this is shown as not live; farther than this from the route is off route.
+    gps_stale_after_s: float = Field(default=120.0, gt=0)
+    off_route_m: float = Field(default=1000.0, gt=0)
+
     # Route scoring weights and cost estimates (see app.optimizer). All must be >= 0.
     score_weight_lateness_per_min: float = Field(default=10.0, ge=0)
     score_weight_travel_per_min: float = Field(default=1.0, ge=0)
