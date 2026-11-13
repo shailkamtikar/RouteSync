@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from app import db
 from app.api.v1 import (
     buses,
+    eta,
     health,
     journeys,
     me,
@@ -100,7 +101,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     v1 = APIRouter(prefix="/api/v1")
-    for module in (me, buses, services, journeys, routing, route_templates, planning):
+    for module in (me, buses, services, journeys, routing, route_templates, planning, eta):
         v1.include_router(module.router)
     app.include_router(v1)
     return app

@@ -106,13 +106,13 @@ def make_journey_stop(c, op, journey, template, template_stop, sequence=1):
     )
 
 
-def make_route_version(c, op, journey, version=1):
+def make_route_version(c, op, journey, version=1, distance_m=None, duration_s=None):
     return one(
         c,
-        "insert into public.route_versions (operator_id, journey_id, version, geometry, reason, "
-        "source) values (%s, %s, %s, %s::extensions.geography, 'initial plan', "
-        "'operator_initial') returning id",
-        (op, journey, version, LINE),
+        "insert into public.route_versions (operator_id, journey_id, version, geometry, "
+        "distance_m, duration_s, reason, source) values (%s, %s, %s, "
+        "%s::extensions.geography, %s, %s, 'initial plan', 'operator_initial') returning id",
+        (op, journey, version, LINE, distance_m, duration_s),
     )
 
 
