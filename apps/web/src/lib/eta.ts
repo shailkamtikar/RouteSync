@@ -50,12 +50,14 @@ export function delayText(commitment: Commitment | undefined): string {
   if (!commitment) return "";
   const minutes = Math.round(Math.abs(commitment.delay_minutes));
   if (minutes < 1) return "On time";
-  if (commitment.delay_minutes < 0) return `About ${minutes} min early`;
-  return commitment.status === "on_time" ? `About ${minutes} min late` : `Running ${minutes} min late`;
+  const span = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")} min` : `${minutes} min`;
+  if (commitment.delay_minutes < 0) return `About ${span} early`;
+  return commitment.status === "on_time" ? `About ${span} late` : `Running ${span} late`;
 }
 
 export function ageText(seconds: number | null): string {
   if (seconds === null) return "no position yet";
+  seconds = Math.max(0, seconds);
   if (seconds < 60) return `${Math.round(seconds)} s ago`;
   if (seconds < 3600) return `${Math.round(seconds / 60)} min ago`;
   return `${Math.round(seconds / 3600)} h ago`;

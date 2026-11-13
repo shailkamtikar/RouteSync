@@ -19,6 +19,7 @@ from app.api.v1 import (
     me,
     monitor,
     planning,
+    public_track,
     reroute,
     route_templates,
     routing,
@@ -120,6 +121,7 @@ def create_app() -> FastAPI:
         traffic,
         reroute,
         monitor,
+        public_track,
     ):
         v1.include_router(module.router)
     app.include_router(v1)

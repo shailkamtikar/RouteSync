@@ -31,12 +31,15 @@ describe("eta formatting", () => {
     expect(delayText(commitment(-12, "on_time"))).toBe("About 12 min early");
     expect(delayText(commitment(4, "on_time"))).toBe("About 4 min late");
     expect(delayText(commitment(25, "significant"))).toBe("Running 25 min late");
+    expect(delayText(commitment(-315, "on_time"))).toBe("About 5 h 15 min early");
+    expect(delayText(commitment(90, "significant"))).toBe("Running 1 h 30 min late");
     expect(delayText(undefined)).toBe("");
   });
 
   it("describes position age", () => {
     expect(ageText(null)).toBe("no position yet");
     expect(ageText(12)).toBe("12 s ago");
+    expect(ageText(-3)).toBe("0 s ago");
     expect(ageText(600)).toBe("10 min ago");
     expect(ageText(7200)).toBe("2 h ago");
   });

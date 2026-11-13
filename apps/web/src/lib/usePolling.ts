@@ -25,12 +25,15 @@ export function usePolling<T>(load: () => Promise<T>, intervalMs: number, enable
     let timer: ReturnType<typeof setTimeout> | undefined;
     let failures = 0;
 
+    let fetched = false;
     const run = async () => {
       if (!active) return;
-      if (document.hidden) {
+      // The first load always happens; later polls wait while the tab is hidden.
+      if (fetched && document.hidden) {
         timer = setTimeout(run, intervalMs);
         return;
       }
+      fetched = true;
       try {
         const value = await loadRef.current();
         if (!active) return;
