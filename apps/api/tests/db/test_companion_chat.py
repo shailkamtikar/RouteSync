@@ -109,7 +109,7 @@ def test_prompt_injection_cannot_change_the_rules(api, live, llm):
 @pytest.mark.parametrize(
     ("error", "fallback", "snippet"),
     [
-        (LLMQuotaExceeded("q"), "quota", "allowance"),
+        (LLMQuotaExceeded("q"), "quota", "busy"),
         (LLMUnavailable("d"), "unavailable", "not available"),
         (LLMBlocked("b"), "blocked", "can't help"),
     ],

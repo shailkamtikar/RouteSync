@@ -20,7 +20,7 @@ TIME_BUDGET_S = 25.0
 MAX_OUTPUT_TOKENS = 350
 
 FALLBACK_QUOTA = (
-    "The assistant is resting for a while because its daily allowance is used up. "
+    "The assistant is busy right now; please try again in a minute. "
     "The tracking page above still shows live arrival times."
 )
 FALLBACK_DOWN = "The assistant is not available right now. The tracking page above still shows live arrival times."
