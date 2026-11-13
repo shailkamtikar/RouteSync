@@ -9,6 +9,7 @@ import { formatClock, formatDuration, formatInZone } from "@/lib/time";
 import { usePolling } from "@/lib/usePolling";
 
 import { RouteMap } from "../map/RouteMap";
+import { CompanionPanel } from "./CompanionPanel";
 import styles from "./tracking.module.css";
 
 const POLL_MS = 10_000;
@@ -292,6 +293,8 @@ export function TrackingPage({ token }: { token: string }) {
           </p>
         )}
       </section>
+
+      <CompanionPanel token={token} view={data} />
 
       <footer className={styles.footer}>
         Times are estimates and may change. Map data © OpenStreetMap contributors.

@@ -1,0 +1,128 @@
+.panel {
+  border: 1px solid #8884;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.title {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  border: 1px solid #1f6feb88;
+  background: #1f6feb14;
+  color: inherit;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.user,
+.assistant {
+  display: flex;
+  flex-direction: column;
+  max-width: 90%;
+}
+
+.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.assistant {
+  align-self: flex-start;
+}
+
+.bubble {
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  background: #8882;
+}
+
+.user .bubble {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.note {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+.error {
+  color: #d1242f;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid #8886;
+  border-radius: 8px;
+  font: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+.counter {
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+
+.send {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #1f6feb;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
