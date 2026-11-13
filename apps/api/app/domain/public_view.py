@@ -46,6 +46,11 @@ def build_public_view(
     conn: psycopg.Connection, operator_id: uuid.UUID, journey_id: uuid.UUID
 ) -> dict[str, Any]:
     ctx = _system_ctx(operator_id)
+    # The snapshot is computed first: it is what raises or clears the public alerts.
+    try:
+        eta = eta_service.current_snapshot(conn, ctx, journey_id)
+    except Conflict:
+        eta = None
     with conn.cursor(row_factory=dict_row) as cur:
         journey = cur.execute(
             "select j.status, j.timezone, j.departure_at, j.booking_eta_at, j.public_counts_enabled, "
@@ -96,10 +101,6 @@ def build_public_view(
             (journey_id, list(PUBLIC_ALERT_TYPES)),
         ).fetchall()
 
-    try:
-        eta = eta_service.current_snapshot(conn, ctx, journey_id)
-    except Conflict:
-        eta = None
     eta_by_id = {s["stop_id"]: s for s in (eta["stops"] if eta else [])}
     counts_enabled = journey["public_counts_enabled"]
 

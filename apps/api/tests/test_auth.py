@@ -126,3 +126,20 @@ def test_client_supplied_operator_id_is_ignored(client, member_of_op1):
 
 def test_health_endpoints_stay_public(client):
     assert client.get("/healthz").status_code == 200
+
+
+def test_token_issued_a_few_seconds_in_the_future_is_accepted(client, member_of_op1):
+    soon = int(time.time()) + 5
+    token = make_token(USER1, iat=soon, nbf=soon)
+    assert client.get("/api/v1/me", headers=auth(token)).status_code == 200
+
+
+def test_token_issued_far_in_the_future_is_rejected(client, member_of_op1):
+    later = int(time.time()) + 120
+    token = make_token(USER1, iat=later, nbf=later)
+    assert client.get("/api/v1/me", headers=auth(token)).status_code == 401
+
+
+def test_token_expired_within_leeway_is_still_accepted(client, member_of_op1):
+    token = make_token(USER1, exp=int(time.time()) - 3)
+    assert client.get("/api/v1/me", headers=auth(token)).status_code == 200

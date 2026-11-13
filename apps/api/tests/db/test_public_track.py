@@ -34,6 +34,14 @@ def live(api, conn, tenants):
         "(%s, %s, 'traffic', 'info', 'Simulated slow traffic ahead on the route.', true)",
         (w["op"], w["journey"], w["op"], w["journey"]),
     )
+    # A real simulated slowdown ahead, so the public traffic alert is genuinely open.
+    conn.execute(
+        "insert into public.traffic_incidents (operator_id, route_template_id, kind, multiplier, "
+        "from_point, to_point, from_km, to_km, starts_at) values (%s, %s, 'slow', 2, "
+        "'POINT(76.2 19.12)'::extensions.geography, 'POINT(76.5 19.2)'::extensions.geography, "
+        "250, 290, clock_timestamp() - interval '1 minute')",
+        (w["op"], w["template"]),
+    )
     r = api.post(f"/journeys/{w['journey']}/tracking-link")
     assert r.status_code == 200, r.text
     w["token"] = r.json()["token"]

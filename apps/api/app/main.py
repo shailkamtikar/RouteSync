@@ -73,6 +73,16 @@ def create_app() -> FastAPI:
         try:
             response = await call_next(request)
             response.headers["X-Request-ID"] = request_id
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["Referrer-Policy"] = "no-referrer"
+            response.headers["X-Frame-Options"] = "DENY"
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'none'; frame-ancestors 'none'"
+                if not request.url.path.startswith(("/docs", "/redoc", "/openapi.json"))
+                else "default-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net"
+            )
+            if "server" in response.headers:
+                del response.headers["server"]
             logger.info(
                 "%s %s -> %s in %.0fms",
                 request.method,

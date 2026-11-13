@@ -12,6 +12,7 @@ from app.config import get_settings
 
 ALLOWED_ALGORITHMS = ["ES256", "RS256"]
 AUDIENCE = "authenticated"
+CLOCK_LEEWAY_S = 10
 
 
 class InvalidToken(Exception):
@@ -55,7 +56,7 @@ def resolve_signing_key(token: str):
             if kid:
                 _known_keys[kid] = key
             return key
-        except jwt.exceptions.PyJWKClientConnectionError as exc:
+        except jwt.exceptions.PyJWKClientError as exc:
             last_error = exc
             if attempt == 0:
                 time.sleep(0.3)
@@ -78,6 +79,9 @@ def verify_access_token(token: str) -> TokenUser:
             audience=AUDIENCE,
             issuer=_issuer(),
             options={"require": ["exp", "sub", "aud", "iss"]},
+            # Tokens are used the instant they are issued; a few seconds of clock difference
+            # between this server and the issuer must not reject them.
+            leeway=CLOCK_LEEWAY_S,
         )
         if claims.get("role") != "authenticated":
             raise InvalidToken("not an authenticated user token")
