@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +17,37 @@ class Settings(BaseSettings):
     corridor_width_m: int = 5000
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     log_level: str = "INFO"
+
+    # Route scoring weights and cost estimates (see app.optimizer). All must be >= 0.
+    score_weight_lateness_per_min: float = Field(default=10.0, ge=0)
+    score_weight_travel_per_min: float = Field(default=1.0, ge=0)
+    score_weight_cost_per_unit: float = Field(default=0.05, ge=0)
+    score_weight_distance_per_km: float = Field(default=0.05, ge=0)
+    score_weight_risk_per_min: float = Field(default=2.0, ge=0)
+    fuel_litres_per_km: float = Field(default=0.35, ge=0)
+    fuel_price_per_litre: float = Field(default=95.0, ge=0)
+    # Unset means "no toll data": tolls are reported as unknown instead of being invented.
+    toll_per_km: float | None = Field(default=None, ge=0)
+
+    def score_weights(self):
+        from app.optimizer.scoring import Weights
+
+        return Weights(
+            lateness_per_min=self.score_weight_lateness_per_min,
+            travel_per_min=self.score_weight_travel_per_min,
+            cost_per_unit=self.score_weight_cost_per_unit,
+            distance_per_km=self.score_weight_distance_per_km,
+            risk_per_min=self.score_weight_risk_per_min,
+        )
+
+    def cost_config(self):
+        from app.optimizer.costs import CostConfig
+
+        return CostConfig(
+            fuel_litres_per_km=self.fuel_litres_per_km,
+            fuel_price_per_litre=self.fuel_price_per_litre,
+            toll_per_km=self.toll_per_km,
+        )
 
     @property
     def cors_origin_list(self) -> list[str]:
