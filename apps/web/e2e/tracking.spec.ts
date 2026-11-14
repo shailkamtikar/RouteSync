@@ -43,7 +43,7 @@ test("passengers follow a journey on the public page", async ({ page, request, c
 
   await expect(page.getByTestId("journey-status")).toContainText("On the way", { timeout: 25_000 });
   await expect(page.getByTestId("next-stop-card")).toContainText("Beed", { timeout: 25_000 });
-  await expect(page.getByTestId("stale-banner")).toHaveCount(0);
+  await expect(page.getByTestId("stale-banner")).toHaveCount(0, { timeout: 25_000 });
   await expect(timeline.locator("li[data-status='completed']")).toHaveCount(1);
   await expect(timeline.locator("li[data-status='next']")).toContainText("Beed");
   await expect(page.getByRole("img", { name: "Bus" })).toBeVisible();

@@ -6,6 +6,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app.api.v1.public_track import invalidate_view
 from app.auth import tokens
 from app.auth.deps import CurrentOperator
 from app.auth.rate_limit import RateLimiter
@@ -50,6 +51,7 @@ def ingest_gps(data: GpsBatchIn, device: Device, conn: DbConn, provider: Routing
     result = gps.ingest_points(conn, device, data.points)
     if result["accepted"]:
         reroute.after_position_update(conn, device, provider)
+        invalidate_view(device.journey_id)
     return result
 
 

@@ -4,6 +4,7 @@ The operator is always resolved from the verified user's membership row.
 No client-supplied operator id is ever read.
 """
 
+import logging
 import uuid
 from dataclasses import dataclass
 from typing import Annotated
@@ -15,6 +16,7 @@ from app.auth.jwt import InvalidToken, TokenUser, verify_access_token
 from app.db import DbConn
 from app.domain import membership
 
+logger = logging.getLogger(__name__)
 _bearer = HTTPBearer(auto_error=False)
 
 
@@ -43,7 +45,11 @@ def get_current_user(
         raise unauthorized
     try:
         return verify_access_token(credentials.credentials)
-    except InvalidToken:
+    except InvalidToken as exc:
+        cause = exc.__cause__
+        logger.warning(
+            "token rejected: %s%s", exc, f" ({type(cause).__name__}: {cause})" if cause else ""
+        )
         raise unauthorized from None
 
 

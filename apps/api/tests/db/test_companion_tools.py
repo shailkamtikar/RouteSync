@@ -222,8 +222,11 @@ def test_context_is_compact_and_safe(conn, live):
 
 
 def test_tools_never_write(conn, live):
+    # Counted for this operator only: other processes may write to the shared dev database.
     before = {
-        t: conn.execute(f"select count(*) from public.{t}").fetchone()[0]
+        t: conn.execute(
+            f"select count(*) from public.{t} where operator_id = %s", (live["op"],)
+        ).fetchone()[0]
         for t in (
             "journeys",
             "journey_stops",
@@ -235,5 +238,10 @@ def test_tools_never_write(conn, live):
     }
     for name in tools.REGISTRY:
         run(conn, live, name, stop_name="Beed")
-    after = {t: conn.execute(f"select count(*) from public.{t}").fetchone()[0] for t in before}
+    after = {
+        t: conn.execute(
+            f"select count(*) from public.{t} where operator_id = %s", (live["op"],)
+        ).fetchone()[0]
+        for t in before
+    }
     assert after == before

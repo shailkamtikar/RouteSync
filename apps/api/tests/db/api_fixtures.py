@@ -1,11 +1,12 @@
 """API client wired to the rolled-back test connection, with ready-made auth headers."""
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db import get_conn
+from app.db import connect_later, get_conn
 from app.main import app
 
 from ..auth_helpers import auth, make_token
@@ -48,8 +49,15 @@ def api(conn, actor, tenants):
         with conn.transaction():
             yield conn
 
+    @contextmanager
+    def lazy():
+        with conn.transaction():
+            yield conn
+
     app.dependency_overrides[get_conn] = override
+    app.dependency_overrides[connect_later] = lambda: lazy
     try:
         yield Api(TestClient(app), tenants)
     finally:
         app.dependency_overrides.pop(get_conn, None)
+        app.dependency_overrides.pop(connect_later, None)
