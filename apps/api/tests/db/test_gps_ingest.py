@@ -12,6 +12,14 @@ pytestmark = pytest.mark.db
 NOW = datetime.now(UTC).replace(microsecond=0)
 
 
+@pytest.fixture(autouse=True)
+def _fresh_clock():
+    # Each test's "now" is taken when it starts, not when the module was imported: the whole suite
+    # can run for a long while, and an "in the future" point must still be in the future.
+    global NOW
+    NOW = datetime.now(UTC).replace(microsecond=0)
+
+
 def ts(seconds: float) -> str:
     return (NOW + timedelta(seconds=seconds)).isoformat()
 
