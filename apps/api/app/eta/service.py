@@ -145,17 +145,22 @@ def current_snapshot(
 ) -> dict[str, Any]:
     """The journey's ETA payload: a recent stored snapshot, or a freshly computed and stored one.
 
-    Every screen reads this one payload, so the numbers on them can never disagree.
+    Every screen reads this one payload, so the numbers on them can never disagree. The stored
+    snapshot is checked first with a single query, so polling screens cost almost nothing.
     """
     clock = now or datetime.now(UTC)
+    if max_age_s > 0:
+        row = conn.execute(
+            "select s.payload from public.journeys j "
+            "join public.journey_eta_snapshots s on s.journey_id = j.id "
+            "  and s.route_version_id = j.current_route_version_id "
+            "where j.id = %s and j.operator_id = %s and s.calculated_at > %s "
+            "and s.calculated_at <= %s order by s.calculated_at desc, s.id desc limit 1",
+            (journey_id, ctx.operator_id, clock - timedelta(seconds=max_age_s), clock),
+        ).fetchone()
+        if row is not None:
+            return row[0]
     data = load_input(conn, ctx, journey_id, clock)
-    latest = latest_snapshot(conn, ctx, journey_id)
-    if (
-        latest is not None
-        and str(latest["route_version_id"]) == data.route_version_id
-        and timedelta(0) <= clock - latest["calculated_at"] < timedelta(seconds=max_age_s)
-    ):
-        return latest["payload"]
     snapshot = compute_snapshot(data)
     journey = journeys.get_journey(conn, ctx, journey_id)
     config = get_settings().commitment_config()

@@ -5,6 +5,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
+import anyio
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -42,7 +43,11 @@ logger = logging.getLogger("routesync.api")
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    configure_logging(get_settings().log_level)
+    settings = get_settings()
+    configure_logging(settings.log_level)
+    # Sync handlers run on this thread pool. It must be much larger than the connection pool:
+    # otherwise requests waiting for a connection can hold every thread and nothing finishes.
+    anyio.to_thread.current_default_thread_limiter().total_tokens = settings.worker_threads
     db.get_pool()
     yield
     db.close_pool()

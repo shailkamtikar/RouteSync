@@ -1,0 +1,17 @@
+name: keepalive
+# Free-tier guard: Supabase pauses projects after a week without database activity, and a
+# free Render service sleeps after 15 minutes idle. This touches both on a schedule.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the API readiness check (also reaches the database)
+        if: ${{ vars.API_URL != '' }}
+        run: curl -fsS --max-time 60 "${{ vars.API_URL }}/readyz" || echo "api not reachable"
+      - name: Ping the web app
+        if: ${{ vars.WEB_URL != '' }}
+        run: curl -fsS --max-time 60 -o /dev/null "${{ vars.WEB_URL }}" || echo "web not reachable"

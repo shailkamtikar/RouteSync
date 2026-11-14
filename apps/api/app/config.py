@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     gps_max_speed_kmh: float = Field(default=160.0, gt=0)
     gps_future_tolerance_s: float = Field(default=60.0, ge=0)
     ingest_rate_per_min: int = Field(default=120, gt=0)
+    db_pool_max: int = Field(default=10, gt=0)
+    # Seconds a request waits for a pooled connection before answering 503 instead of piling up.
+    db_pool_timeout_s: float = Field(default=10.0, gt=0)
+    # Threads available to run request handlers; must exceed db_pool_max by a wide margin so a
+    # request holding a connection can always get a thread to finish its work.
+    worker_threads: int = Field(default=100, gt=0)
 
     # ETA: a position older than this is shown as not live; farther than this from the route is off route.
     gps_stale_after_s: float = Field(default=120.0, gt=0)
@@ -46,8 +52,12 @@ class Settings(BaseSettings):
 
     # Public tracking links and public endpoint limits.
     tracking_link_hours_after_arrival: float = Field(default=24.0, ge=0)
-    public_rate_per_min_ip: int = Field(default=120, gt=0)
-    public_rate_per_min_token: int = Field(default=60, gt=0)
+    # A link is shared by everyone on the bus and many viewers sit behind one address, so these
+    # limits are for abuse, not for normal polling (one request every 10 s per viewer).
+    public_rate_per_min_ip: int = Field(default=600, gt=0)
+    public_rate_per_min_token: int = Field(default=900, gt=0)
+    # Seconds a built public view is reused for other viewers of the same link.
+    public_view_cache_s: float = Field(default=3.0, ge=0)
 
     # Rerouting guardrails. These are tuning values, not product rules.
     reroute_autoapply: bool = True
