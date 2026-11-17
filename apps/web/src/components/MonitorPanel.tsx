@@ -1,6 +1,18 @@
 "use client";
 
-import Link from "next/link";
+import {
+  Bell,
+  Check,
+  CircleAlert,
+  Clock,
+  Flag,
+  Gauge,
+  MapPin,
+  Radio,
+  Route as RouteIcon,
+  Users,
+  WifiOff,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { authedGet, authedRequest } from "@/lib/api";
@@ -11,7 +23,11 @@ import { formatClock, formatInZone } from "@/lib/time";
 import { usePolling } from "@/lib/usePolling";
 import { useResource } from "@/lib/useResource";
 
+import { RouteLabel, SkeletonRows } from "./kit/bits";
+import { PageHeader } from "./kit/PageHeader";
+import { Pill, StatusBadge } from "./kit/StatusBadge";
 import { RouteMap } from "./map/RouteMap";
+import styles from "./monitor.module.css";
 import ui from "./ui.module.css";
 
 type MonitorStop = {
@@ -166,151 +182,183 @@ export function MonitorPanel({ journeyId }: { journeyId: string }) {
   if (!data) {
     return pollError ? (
       <div className={ui.stack}>
+        <PageHeader title="Journey not found" back={{ href: "/dashboard/journeys", label: "Journeys" }} />
         <p className={ui.error} role="alert">
-          {pollError === "Journey not found" ? "Journey not found." : pollError}
+          {pollError === "Journey not found" ? "This journey does not exist or belongs to another operator." : pollError}
         </p>
-        <Link href="/dashboard/journeys">Back to journeys</Link>
       </div>
     ) : (
-      <p className={ui.muted}>Loading monitor…</p>
+      <SkeletonRows rows={3} height={110} />
     );
   }
 
   const running = RUNNING.includes(data.journey.status);
+  const nextEta = eta?.next_stop.eta ?? null;
+  const destEta = eta?.destination.eta ?? null;
+  const late = eta?.commitment && eta.commitment.status !== "on_time";
+
   return (
     <div className={ui.stack}>
-      <h1>
-        {data.journey.origin_name} → {data.journey.destination_name}{" "}
-        <span className={ui.badge} data-testid="monitor-status">
-          {data.journey.status.replaceAll("_", " ")}
-        </span>
-      </h1>
-      <p className={ui.muted}>
-        Bus {data.journey.bus_registration} · <Link href={`/dashboard/journeys/${journeyId}`}>Journey setup</Link>
-      </p>
+      <PageHeader
+        back={{ href: `/dashboard/journeys/${journeyId}`, label: "Journey setup" }}
+        title={<RouteLabel from={data.journey.origin_name} to={data.journey.destination_name} />}
+        subtitle={
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span data-testid="monitor-status" className={styles.statusText}>
+              <StatusBadge status={data.journey.status} />
+            </span>
+            <span>Bus {data.journey.bus_registration}</span>
+            {data.journey.manual_mode && <Pill tone="warn">Manual mode</Pill>}
+          </span>
+        }
+        actions={
+          <span className={styles.live} aria-live="polite">
+            <Radio size={14} aria-hidden /> Updating every {POLL_MS / 1000} s
+          </span>
+        }
+      />
 
       {pollError && (
-        <p className={ui.error} role="status" data-testid="monitor-reconnecting">
-          Reconnecting… showing the last update received.
+        <p className={`${ui.notice} ${ui.noticeWarn}`} role="status" data-testid="monitor-reconnecting">
+          <WifiOff size={16} aria-hidden /> Reconnecting… showing the last update received.
         </p>
       )}
       {stale && (
-        <p className={ui.error} role="status" data-testid="stale-banner">
-          Location not live. Last position received {ageText(eta?.gps_age_s ?? null)}.
+        <p className={`${ui.notice} ${ui.noticeWarn}`} role="status" data-testid="stale-banner">
+          <CircleAlert size={16} aria-hidden /> Location not live. Last position received {ageText(eta?.gps_age_s ?? null)}.
         </p>
       )}
       {error && (
-        <p className={ui.error} data-testid="monitor-error">
+        <p className={ui.error} role="alert" data-testid="monitor-error">
           {error}
         </p>
       )}
 
       {data.alerts.length > 0 && (
-        <ul className={ui.card} aria-label="Alerts" data-testid="monitor-alerts">
+        <ul className={styles.alerts} aria-label="Alerts" data-testid="monitor-alerts">
           {data.alerts.map((alert) => (
-            <li key={alert.id} className={alert.severity === "info" ? ui.muted : ui.error}>
-              {alert.message}
+            <li key={alert.id} data-severity={alert.severity}>
+              <Bell size={15} aria-hidden /> {alert.message}
             </li>
           ))}
         </ul>
       )}
 
       {eta ? (
-        <div className={ui.row}>
-          <div className={ui.card} data-testid="next-stop-card">
-            <div className={ui.muted}>{eta.flags.next_is_destination ? "Next: destination" : "Next stop"}</div>
-            <strong>{eta.next_stop.name}</strong>
-            <div>
-              {countdown(eta.next_stop.eta, nowMs)} · {eta.next_stop.eta ? formatClock(eta.next_stop.eta, zone) : "—"}
-            </div>
-            <div className={ui.muted}>{kilometres(eta.next_stop.remaining_m)} to go</div>
+        <div className={styles.kpis}>
+          <div className={styles.kpi} data-testid="next-stop-card">
+            <span className={styles.kpiLabel}>
+              <MapPin size={14} aria-hidden /> {eta.flags.next_is_destination ? "Next: destination" : "Next stop"}
+            </span>
+            <strong className={styles.kpiBig}>{eta.next_stop.name}</strong>
+            <span className={styles.kpiValue}>
+              {countdown(nextEta, nowMs)}
+              <small>{nextEta ? ` · ${formatClock(nextEta, zone)}` : ""}</small>
+            </span>
+            <span className={styles.kpiSub}>{kilometres(eta.next_stop.remaining_m)} to go</span>
           </div>
-          <div className={ui.card} data-testid="destination-card">
-            <div className={ui.muted}>Destination</div>
-            <strong>{eta.destination.name}</strong>
-            <div>
-              {countdown(eta.destination.eta, nowMs)} · {eta.destination.eta ? formatClock(eta.destination.eta, zone) : "—"}
-            </div>
-            <div className={ui.muted}>{kilometres(eta.remaining_distance_m)} to go</div>
+          <div className={styles.kpi} data-testid="destination-card">
+            <span className={styles.kpiLabel}>
+              <Flag size={14} aria-hidden /> Destination
+            </span>
+            <strong className={styles.kpiBig}>{eta.destination.name}</strong>
+            <span className={styles.kpiValue}>
+              {countdown(destEta, nowMs)}
+              <small>{destEta ? ` · ${formatClock(destEta, zone)}` : ""}</small>
+            </span>
+            <span className={styles.kpiSub}>{kilometres(eta.remaining_distance_m)} to go</span>
           </div>
-          <div className={ui.card} data-testid="commitment-card">
-            <div className={ui.muted}>Promised at booking</div>
-            <strong>{formatInZone(data.journey.booking_eta_at, zone)}</strong>
-            <div>{delayText(eta.commitment)}</div>
-            <div className={ui.muted}>{eta.progress_pct.toFixed(0)}% of the route covered</div>
+          <div className={`${styles.kpi} ${late ? styles.kpiLate : ""}`} data-testid="commitment-card">
+            <span className={styles.kpiLabel}>
+              <Clock size={14} aria-hidden /> Promised at booking
+            </span>
+            <strong className={styles.kpiBig}>{formatInZone(data.journey.booking_eta_at, zone)}</strong>
+            <span className={`${styles.kpiValue} ${late ? styles.warnText : styles.okText}`}>{delayText(eta.commitment)}</span>
+            <span className={styles.kpiSub}>{eta.progress_pct.toFixed(0)}% of the route covered</span>
           </div>
-          <div className={ui.card} data-testid="onboard-card">
-            <div className={ui.muted}>On board</div>
-            <strong>
+          <div className={styles.kpi} data-testid="onboard-card">
+            <span className={styles.kpiLabel}>
+              <Users size={14} aria-hidden /> On board
+            </span>
+            <strong className={styles.kpiBig}>
               {data.onboard.method === "recorded_events" ? data.onboard.onboard : `${data.onboard.planned_onboard} (planned)`}
             </strong>
-            <div className={ui.muted}>
+            <span className={styles.kpiSub}>
               {data.onboard.method === "recorded_events" ? "from recorded boardings" : "no boardings recorded yet"}
-            </div>
+            </span>
           </div>
         </div>
       ) : (
-        <p className={ui.muted}>No route has been assigned to this journey yet.</p>
+        <p className={ui.notice}>No route has been assigned to this journey yet.</p>
       )}
 
-      <RouteMap key={data.route?.version ?? 0} routes={mapRoutes} stops={mapStops} bus={bus} />
+      <div className={styles.layout}>
+        <div className={styles.mapCol}>
+          <RouteMap key={data.route?.version ?? 0} routes={mapRoutes} stops={mapStops} bus={bus} height="100%" label="Live journey map" />
+        </div>
 
-      <section className={ui.stack} aria-label="Stops">
-        <h2>Stops</h2>
-        <div className={ui.tableWrap}>
-          <table className={ui.table} aria-label="Stop events">
-            <thead>
-              <tr>
-                <th>Stop</th>
-                <th>Plan</th>
-                <th>Status</th>
-                <th>Record</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div className={styles.side}>
+          <section className={styles.panel} aria-label="Stops">
+            <h2 className={ui.sectionTitle}>Stops</h2>
+            <ol className={styles.stops} aria-label="Stop events">
               {data.stops.map((stop) => (
-                <tr key={stop.journey_stop_id}>
-                  <td>{stop.name}</td>
-                  <td>
-                    {stop.pickup_count} board, {stop.drop_count} alight
-                  </td>
-                  <td>
-                    <span className={ui.badge}>{stop.status}</span>
-                  </td>
-                  <td>
+                <li key={stop.journey_stop_id} data-status={stop.status}>
+                  <span className={styles.node} aria-hidden>
+                    {stop.status === "departed" && <Check size={11} />}
+                  </span>
+                  <div className={styles.stopBody}>
+                    <div className={ui.spread}>
+                      <strong>{stop.name}</strong>
+                      <Pill tone={stop.status === "departed" ? "neutral" : stop.status === "arrived" ? "ok" : "info"}>
+                        {stop.status === "pending" ? "Upcoming" : stop.status === "arrived" ? "At stop" : "Departed"}
+                      </Pill>
+                    </div>
+                    <small>
+                      {stop.pickup_count} board · {stop.drop_count} alight
+                    </small>
                     {running && stop.status === "pending" && (
-                      <button className={ui.buttonGhost} type="button" disabled={busy} onClick={() => stopEvent(stop, "arrived")}>
+                      <button className={`${ui.buttonGhost} ${ui.sm}`} type="button" disabled={busy} onClick={() => stopEvent(stop, "arrived")}>
                         Arrived
                       </button>
                     )}
                     {running && stop.status === "arrived" && (
-                      <form className={ui.row} onSubmit={(event) => onCount(event, stop)}>
-                        <label className={ui.field}>
-                          <input name="count" type="number" min={1} max={100} defaultValue={1} style={{ width: 64 }} aria-label={`Passenger count at ${stop.name}`} />
-                        </label>
-                        <button className={ui.buttonGhost} type="submit" value="boarded" disabled={busy}>
+                      <form className={styles.recordRow} onSubmit={(event) => onCount(event, stop)}>
+                        <input
+                          name="count"
+                          type="number"
+                          min={1}
+                          max={100}
+                          defaultValue={1}
+                          aria-label={`Passenger count at ${stop.name}`}
+                          className={ui.input}
+                          style={{ width: 70 }}
+                        />
+                        <button className={`${ui.buttonGhost} ${ui.sm}`} type="submit" value="boarded" disabled={busy}>
                           Boarded
                         </button>
-                        <button className={ui.buttonGhost} type="submit" value="alighted" disabled={busy}>
+                        <button className={`${ui.buttonGhost} ${ui.sm}`} type="submit" value="alighted" disabled={busy}>
                           Alighted
                         </button>
-                        <button className={ui.button} type="button" disabled={busy} onClick={() => stopEvent(stop, "departed")}>
+                        <button className={`${ui.button} ${ui.sm}`} type="button" disabled={busy} onClick={() => stopEvent(stop, "departed")}>
                           {stop.role === "destination" ? "Finish journey" : "Departed"}
                         </button>
                       </form>
                     )}
-                  </td>
-                </tr>
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ol>
+          </section>
         </div>
-      </section>
+      </div>
 
-      <section className={ui.stack} aria-label="Route control">
-        <h2>Route control</h2>
-        <div className={ui.row}>
-          <label className={ui.row}>
+      <div className={styles.columns}>
+        <section className={styles.panel} aria-label="Route control">
+          <div className={ui.rowCenter}>
+            <RouteIcon size={18} aria-hidden style={{ color: "var(--brand)" }} />
+            <h2 className={ui.sectionTitle}>Route control</h2>
+          </div>
+          <label className={ui.checkboxRow}>
             <input
               type="checkbox"
               checked={data.journey.manual_mode}
@@ -320,111 +368,116 @@ export function MonitorPanel({ journeyId }: { journeyId: string }) {
             Manual mode (route changes need my approval)
           </label>
           {running && (
-            <>
+            <div className={ui.rowCenter}>
               <button className={ui.buttonGhost} type="button" disabled={busy} onClick={() => run(() => authedRequest(`${base}/reroute/evaluate`, "POST", {}))}>
-                Check for a better route
+                <Gauge size={15} aria-hidden /> Check for a better route
               </button>
-              <button className={ui.buttonGhost} type="button" disabled={busy} onClick={() => run(() => authedRequest(`${base}/reroute/evaluate`, "POST", { apply: true }))}>
+              <button className={ui.buttonSoft} type="button" disabled={busy} onClick={() => run(() => authedRequest(`${base}/reroute/evaluate`, "POST", { apply: true }))}>
                 Apply suggested change
               </button>
-            </>
+            </div>
           )}
-        </div>
-        {data.route && (
-          <p className={ui.muted} data-testid="route-version">
-            Route version {data.route.version}: {data.route.reason}
-          </p>
-        )}
-        {data.decisions.length > 0 && (
-          <ul aria-label="Route decisions" data-testid="decision-log">
-            {data.decisions.map((decision) => (
-              <li key={decision.id}>
-                {formatClock(decision.decided_at, zone)} · <strong>{decision.outcome.replaceAll("_", " ")}</strong> · {decision.reason}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {templateId && (
-        <section className={ui.stack} aria-label="Simulated traffic">
-          <h2>Simulated traffic</h2>
-          <p className={ui.muted}>
-            The map data has no live traffic. Incidents added here are simulated and labelled as such everywhere.
-          </p>
-          <form className={`${ui.row} ${ui.card}`} onSubmit={onIncident} aria-label="Add simulated incident">
-            <label className={ui.field}>
-              Type
-              <select name="kind" defaultValue="slow">
-                <option value="slow">Slow traffic</option>
-                <option value="closure">Road closure</option>
-              </select>
-            </label>
-            <label className={ui.field}>
-              From km
-              <input name="from_km" type="number" min={0} step="any" required style={{ width: 90 }} />
-            </label>
-            <label className={ui.field}>
-              To km
-              <input name="to_km" type="number" min={0} step="any" required style={{ width: 90 }} />
-            </label>
-            <label className={ui.field}>
-              Times slower
-              <input name="multiplier" type="number" min={1} max={20} step="any" defaultValue={3} style={{ width: 90 }} />
-            </label>
-            <button className={ui.button} type="submit" disabled={busy}>
-              Add incident
-            </button>
-          </form>
-          {incidents.length > 0 && (
-            <ul aria-label="Active incidents">
-              {incidents.map((incident) => (
-                <li key={incident.id} className={ui.row}>
-                  Simulated {incident.kind === "closure" ? "closure" : `slowdown ×${incident.multiplier}`}, km {incident.from_km}–{incident.to_km}
-                  <button
-                    className={ui.buttonDanger}
-                    type="button"
-                    disabled={busy}
-                    onClick={() =>
-                      run(async () => {
-                        await authedRequest(`/api/v1/traffic-incidents/${incident.id}`, "DELETE");
-                        loadIncidents();
-                      })
-                    }
-                  >
-                    End
-                  </button>
+          {data.route && (
+            <p className={ui.small} data-testid="route-version">
+              Route version {data.route.version}: {data.route.reason}
+            </p>
+          )}
+          {data.decisions.length > 0 && (
+            <ul className={styles.decisions} aria-label="Route decisions" data-testid="decision-log">
+              {data.decisions.map((decision) => (
+                <li key={decision.id}>
+                  <time>{formatClock(decision.decided_at, zone)}</time>
+                  <span>
+                    <strong>{decision.outcome.replaceAll("_", " ")}</strong> · {decision.reason}
+                  </span>
                 </li>
               ))}
             </ul>
           )}
         </section>
-      )}
 
-      <section className={ui.stack} aria-label="GPS device">
-        <h2>GPS device</h2>
-        <div className={ui.row}>
-          <button
-            className={ui.buttonGhost}
-            type="button"
-            disabled={busy}
-            onClick={() =>
-              run(async () => {
-                const result = await authedRequest<{ token: string }>(`${base}/ingest-token`, "POST");
-                setToken(result.token);
-              })
-            }
-          >
-            Create device token
-          </button>
-          <span className={ui.muted}>Creating a new token cancels the previous one.</span>
-        </div>
-        {token && (
-          <p className={ui.card} data-testid="device-token">
-            Copy this token now; it is shown only once: <code>{token}</code>
-          </p>
+        {templateId && (
+          <section className={styles.panel} aria-label="Simulated traffic">
+            <h2 className={ui.sectionTitle}>Simulated traffic</h2>
+            <p className={ui.small}>
+              The map data has no live traffic. Incidents added here are simulated and labelled as such everywhere.
+            </p>
+            <form className={ui.row} onSubmit={onIncident} aria-label="Add simulated incident">
+              <label className={ui.field}>
+                Type
+                <select name="kind" defaultValue="slow">
+                  <option value="slow">Slow traffic</option>
+                  <option value="closure">Road closure</option>
+                </select>
+              </label>
+              <label className={ui.field}>
+                From km
+                <input name="from_km" type="number" min={0} step="any" required style={{ width: 90 }} />
+              </label>
+              <label className={ui.field}>
+                To km
+                <input name="to_km" type="number" min={0} step="any" required style={{ width: 90 }} />
+              </label>
+              <label className={ui.field}>
+                Times slower
+                <input name="multiplier" type="number" min={1} max={20} step="any" defaultValue={3} style={{ width: 90 }} />
+              </label>
+              <button className={ui.button} type="submit" disabled={busy}>
+                Add incident
+              </button>
+            </form>
+            {incidents.length > 0 && (
+              <ul className={styles.incidents} aria-label="Active incidents">
+                {incidents.map((incident) => (
+                  <li key={incident.id}>
+                    <span>
+                      Simulated {incident.kind === "closure" ? "closure" : `slowdown ×${incident.multiplier}`}, km {incident.from_km}–{incident.to_km}
+                    </span>
+                    <button
+                      className={`${ui.buttonDanger} ${ui.sm}`}
+                      type="button"
+                      disabled={busy}
+                      onClick={() =>
+                        run(async () => {
+                          await authedRequest(`/api/v1/traffic-incidents/${incident.id}`, "DELETE");
+                          loadIncidents();
+                        })
+                      }
+                    >
+                      End
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         )}
-      </section>
+
+        <section className={styles.panel} aria-label="GPS device">
+          <h2 className={ui.sectionTitle}>GPS device</h2>
+          <p className={ui.small}>The bus reports its position with a private device token. Creating a new token cancels the previous one.</p>
+          <div>
+            <button
+              className={ui.buttonGhost}
+              type="button"
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  const result = await authedRequest<{ token: string }>(`${base}/ingest-token`, "POST");
+                  setToken(result.token);
+                })
+              }
+            >
+              Create device token
+            </button>
+          </div>
+          {token && (
+            <p className={ui.notice} data-testid="device-token">
+              Copy this token now; it is shown only once: <code className={ui.mono}>{token}</code>
+            </p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

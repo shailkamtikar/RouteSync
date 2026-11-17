@@ -1,0 +1,184 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.mapCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 520px;
+}
+
+.mapWrap {
+  flex: 1;
+  min-height: 440px;
+}
+
+.liveList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.liveCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s;
+}
+
+.liveCard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent, var(--brand));
+}
+
+.liveCardFocus {
+  border-color: var(--accent, var(--brand));
+}
+
+.liveFocus {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius);
+}
+
+.liveCard a {
+  position: relative;
+  z-index: 1;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+.progress {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--accent, var(--brand));
+  transition: width 0.6s ease;
+}
+
+.onTime,
+.late {
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.onTime {
+  color: var(--ok);
+}
+
+.late {
+  color: var(--warn);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.rows {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.rows li + li .row {
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.row:hover {
+  background: var(--surface-2);
+}
+
+.when {
+  flex: none;
+  width: 108px;
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.what {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.what small {
+  color: var(--text-3);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1100px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .liveList {
+    max-height: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  .mapCard {
+    min-height: 420px;
+  }
+
+  .when {
+    width: 88px;
+  }
+}

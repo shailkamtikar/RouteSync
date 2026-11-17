@@ -1,191 +1,128 @@
-"""Create a complete demo journey through the public API, ready to be driven by the simulator.
+"""Prepare a journey for a live demo and write how to open it.
 
-It signs in as a seeded test operator and performs the same steps an operator would:
-service -> route option -> stops -> bus -> journey -> bookings -> confirm stops -> assign route
--> publish -> start boarding -> create a device token.
+It reuses the network built by seed_network.py: it finds a journey of the chosen service in the
+chosen state (or schedules a new one), then creates a public tracking link and a device token for it.
+Nothing is created unless it is missing, so running it twice does not litter the database.
 
-Usage (API must be running on :8000):
+Usage (API on :8010, network seeded):
     apps/api/.venv/Scripts/python scripts/demo_setup.py --out demo.json
 
-The result (journey id, device token, public tracking link if available) is written as JSON to
---out, or to standard output when --out is not given. The file contains a secret token: keep it
-out of version control (the default name demo.json is git-ignored).
+The result (journey id, monitor URL, public tracking URL, device token) is written as JSON to --out,
+or to standard output. The file holds secret tokens: keep it out of version control (demo.json is
+git-ignored).
 """
 
 import argparse
 import json
 import secrets
 import sys
-import urllib.error
-import urllib.request
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
-from dotenv import dotenv_values
-
-ROOT = Path(__file__).resolve().parents[1]
-api_env = dotenv_values(ROOT / "apps" / "api" / ".env")
-web_env = dotenv_values(ROOT / "apps" / "web" / ".env.local")
-
-PUNE = {"lat": 18.5204, "lng": 73.8567}
-NANDED = {"lat": 19.1383, "lng": 77.321}
-VIA = [
-    {"name": "Ahmednagar", "lat": 19.0948, "lng": 74.7496},
-    {"name": "Beed", "lat": 18.9891, "lng": 75.7601},
-]
-BOOKINGS = [(3, "Pune", "Beed"), (2, "Beed", "Nanded"), (2, "Pune", "Nanded")]
-
-
-class Client:
-    def __init__(self, base: str):
-        self.base = base.rstrip("/")
-        self.token = ""
-
-    def call(
-        self,
-        method: str,
-        path: str,
-        body=None,
-        *,
-        absolute=False,
-        headers=None,
-        optional=False,
-    ):
-        url = path if absolute else f"{self.base}/api/v1{path}"
-        request = urllib.request.Request(
-            url,
-            data=json.dumps(body).encode() if body is not None else None,
-            method=method,
-            headers={
-                "Content-Type": "application/json",
-                **({"Authorization": f"Bearer {self.token}"} if self.token else {}),
-                **(headers or {}),
-            },
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=90) as response:
-                raw = response.read()
-                return json.loads(raw) if raw else None
-        except urllib.error.HTTPError as exc:
-            if optional and exc.code == 404:
-                return None
-            detail = exc.read().decode(errors="replace")[:300]
-            sys.exit(f"{method} {path} failed: HTTP {exc.code} {detail}")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _common import DEFAULT_API, DEFAULT_WEB, signed_in
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--api", default="http://127.0.0.1:8000")
-    parser.add_argument("--web", default="http://localhost:3000")
+    parser.add_argument("--api", default=DEFAULT_API)
+    parser.add_argument("--web", default=DEFAULT_WEB)
     parser.add_argument("--user", default="owner1@routesync.test")
+    parser.add_argument("--origin", default="Pune")
+    parser.add_argument("--destination", default="Nanded")
     parser.add_argument("--out", default=None)
     parser.add_argument(
-        "--status", default="boarding", choices=["ready", "published", "boarding"]
+        "--new",
+        action="store_true",
+        help="always schedule a fresh journey on its own new bus (used by the browser tests)",
+    )
+    parser.add_argument(
+        "--status",
+        default="boarding",
+        choices=["ready", "published", "boarding", "in_progress"],
     )
     args = parser.parse_args()
+    client = signed_in(args.api, args.user)
 
-    client = Client(args.api)
-    session = client.call(
-        "POST",
-        f"{api_env['SUPABASE_URL'].rstrip('/')}/auth/v1/token?grant_type=password",
-        {"email": args.user, "password": api_env["SEED_USER_PASSWORD"]},
-        absolute=True,
-        headers={"apikey": web_env["NEXT_PUBLIC_SUPABASE_ANON_KEY"]},
+    journeys = (
+        []
+        if args.new
+        else [
+            j
+            for j in client.call("GET", "/journeys")
+            if (j["origin_name"], j["destination_name"])
+            == (args.origin, args.destination)
+            and j["status"] == args.status
+        ]
     )
-    client.token = session["access_token"]
+    if journeys:
+        journey = max(journeys, key=lambda j: j["departure_at"])
+    else:
+        # Nothing suitable yet: schedule one on the existing service (building the network if needed).
+        from seed_network import JOURNEYS, ensure_network, make_journey
 
-    service = client.call(
-        "POST",
-        "/services",
-        {
-            "origin_name": "Pune",
-            "destination_name": "Nanded",
-            "origin_location": PUNE,
-            "destination_location": NANDED,
-        },
-    )
-    created = client.call(
-        "POST",
-        f"/services/{service['id']}/route-templates",
-        {"name": "Via Ahmednagar and Beed", "via_points": VIA},
-    )
-    if created["generation_error"]:
-        sys.exit(f"route generation failed: {created['generation_error']}")
-    template = created["template"]
-    client.call(
-        "POST",
-        f"/route-templates/{template['id']}/stops",
-        {"name": "Beed", "location": {"lat": VIA[1]["lat"], "lng": VIA[1]["lng"]}},
-    )
+        world = ensure_network(client, only=[(args.origin, args.destination)])
+        bus = (
+            client.call(
+                "POST",
+                "/buses",
+                {
+                    "registration": f"MH12 {secrets.token_hex(3).upper()}",
+                    "capacity": 40,
+                },
+            )
+            if args.new
+            else None
+        )
+        spec = (args.origin, args.destination, 0, args.status, 10, 0)
+        if not args.new:
+            spec = next(
+                (s for s in JOURNEYS if (s[0], s[1], s[3]) == spec[:2] + spec[3:4]),
+                spec,
+            )
+        bookings = None
+        if args.new:
+            # Fixed, easy-to-assert bookings: the middle stop of the route is the one that matters.
+            option = world["network"][(args.origin, args.destination)]["corridor"][
+                "options"
+            ][0]
+            middle = option["stops"][len(option["stops"]) // 2]
+            bookings = [
+                (3, args.origin, middle),
+                (2, middle, args.destination),
+                (2, args.origin, args.destination),
+            ]
+        jid = make_journey(client, world, spec, datetime.now(UTC), bus, bookings)
+        journey = client.call("GET", f"/journeys/{jid}")
 
-    bus = client.call(
-        "POST",
-        "/buses",
-        {"registration": f"MH12 {secrets.token_hex(3).upper()}", "capacity": 40},
-    )
-    now = datetime.now(UTC)
-    journey = client.call(
-        "POST",
-        "/journeys",
-        {
-            "bus_id": bus["id"],
-            "service_id": service["id"],
-            "departure_at": now.isoformat(),
-            "scheduled_arrival_at": (now + timedelta(hours=9)).isoformat(),
-        },
-    )
     jid = journey["id"]
-    for count, pickup, drop in BOOKINGS:
-        client.call(
-            "POST",
-            f"/journeys/{jid}/bookings",
-            {
-                "passenger_count": count,
-                "pickup_stop_name": pickup,
-                "drop_stop_name": drop,
-            },
-        )
-    client.call(
-        "PUT", f"/journeys/{jid}/route-template", {"route_template_id": template["id"]}
-    )
-    plan = client.call("GET", f"/journeys/{jid}/stop-plan")
-    active = [
-        {
-            "route_template_stop_id": stop["route_template_stop_id"],
-            "pickup_count": stop["booked_pickups"],
-            "drop_count": stop["booked_drops"],
-        }
-        for stop in plan["stops"]
-        if stop["booked_pickups"] + stop["booked_drops"] > 0
-    ]
-    client.call("PUT", f"/journeys/{jid}/active-stops", {"stops": active})
-    client.call("POST", f"/journeys/{jid}/transition", {"to": "awaiting_confirmation"})
-    client.call("POST", f"/journeys/{jid}/assign")
-
-    result = {"journey_id": jid, "status": "ready", "route_template_id": template["id"]}
-    if args.status in ("published", "boarding"):
-        published = client.call(
-            "POST", f"/journeys/{jid}/transition", {"to": "published"}
-        )
-        result["status"] = published["status"]
+    result = {"journey_id": jid, "status": journey["status"]}
+    if journey["status"] in ("published", "boarding", "in_progress"):
         link = client.call("POST", f"/journeys/{jid}/tracking-link", optional=True)
         if link:
             result["tracking_url"] = f"{args.web}/track/{link['token']}"
-    if args.status == "boarding":
-        result["status"] = client.call(
-            "POST", f"/journeys/{jid}/transition", {"to": "boarding"}
-        )["status"]
     result["device_token"] = client.call("POST", f"/journeys/{jid}/ingest-token")[
         "token"
     ]
+    # Points that lie on the assigned road, for driving a device by hand (tests, demos).
+    from fleet_simulator import Line
+
+    route = client.call("GET", f"/journeys/{jid}/monitor")["route"]
+    if route:
+        line = Line([tuple(c) for c in route["coordinates"]])
+        result["route_positions"] = {
+            str(pct): dict(
+                zip(("lng", "lat"), line.at(line.length * pct / 100), strict=True)
+            )
+            for pct in (5, 25, 55, 98)
+        }
     result["monitor_url"] = f"{args.web}/dashboard/journeys/{jid}/monitor"
+    result["journey_url"] = f"{args.web}/dashboard/journeys/{jid}"
 
     text = json.dumps(result, indent=2)
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
-        print(
-            f"demo journey {jid} is {result['status']}; details written to {args.out}"
-        )
+        print(f"journey {jid} ({result['status']}); details written to {args.out}")
     else:
         print(text)
 

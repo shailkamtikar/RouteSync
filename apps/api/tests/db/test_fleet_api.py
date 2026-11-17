@@ -234,3 +234,54 @@ def test_earlier_endpoints_still_work(api):
     assert api.client.get("/healthz").status_code == 200
     me = api.get("/me", who="dispatcher1").json()
     assert me["role"] == "dispatcher" and me["operator_name"] == "Test Operator One"
+
+
+def test_service_list_summarises_routes_and_open_journeys(api, conn, tenants):
+    op = tenants["op1"]
+    service = f.make_service(conn, op, "Pune", "Latur")
+    bare = f.make_service(conn, op, "Dhule", "Nandurbar")
+    near = f.make_template(conn, op, service, "Via Baramati")
+    far = f.make_template(conn, op, service, "Via Solapur")
+    conn.execute(
+        "update public.route_templates set status = 'ready', distance_m = %s where id = %s",
+        (310_000, near),
+    )
+    conn.execute(
+        "update public.route_templates set status = 'ready', distance_m = %s where id = %s",
+        (390_000, far),
+    )
+    bus = f.make_bus(conn, op)
+    f.make_journey(conn, op, bus, service, near, status="published")
+
+    rows = {row["destination_name"]: row for row in api.get("/services").json()}
+    assert rows["Latur"]["route_count"] == 2
+    assert rows["Latur"]["shortest_m"] == 310_000
+    assert rows["Latur"]["longest_m"] == 390_000
+    assert rows["Latur"]["active_journeys"] == 1
+    # A service with nothing yet reports zeros, not missing fields.
+    assert rows["Nandurbar"]["route_count"] == 0
+    assert rows["Nandurbar"]["shortest_m"] is None
+    assert rows["Nandurbar"]["active_journeys"] == 0
+    assert bare
+
+
+def test_service_summary_ignores_archived_routes_and_other_operators(api, conn, tenants):
+    op1, op2 = tenants["op1"], tenants["op2"]
+    service = f.make_service(conn, op1, "Mumbai", "Kolhapur")
+    live = f.make_template(conn, op1, service, "Via Pune")
+    old = f.make_template(conn, op1, service, "Old road")
+    conn.execute(
+        "update public.route_templates set status = 'ready', distance_m = 405000 where id = %s",
+        (live,),
+    )
+    conn.execute(
+        "update public.route_templates set status = 'archived', distance_m = 100000 where id = %s",
+        (old,),
+    )
+    other = f.make_service(conn, op2, "Mumbai", "Kolhapur")
+    f.make_template(conn, op2, other, "Their road")
+
+    mine = [r for r in api.get("/services").json() if r["destination_name"] == "Kolhapur"]
+    assert len(mine) == 1
+    assert mine[0]["route_count"] == 1
+    assert mine[0]["shortest_m"] == 405_000

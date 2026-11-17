@@ -1,0 +1,266 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.mapCol {
+  position: sticky;
+  top: 20px;
+  height: calc(100vh - 60px);
+  min-height: 460px;
+  max-height: 780px;
+}
+
+.listCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.options {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.optionActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-md);
+}
+
+.optionMain {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.swatch {
+  flex: none;
+  width: 6px;
+  align-self: stretch;
+  border-radius: 99px;
+  background: var(--accent);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.optionText strong {
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
+}
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+.metrics span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.optionActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+
+.suggest {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+  border: 1px solid color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+.suggestHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--brand);
+  margin-bottom: 8px;
+}
+
+.suggest ul {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.suggest li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.stops {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.timeline {
+  list-style: none;
+  position: relative;
+}
+
+.timeline li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 0 9px 4px;
+}
+
+.timeline li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 28px;
+  bottom: -9px;
+  width: 2px;
+  background: var(--border-strong);
+}
+
+.node {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--brand);
+}
+
+.timeline li[data-role="origin"] .node,
+.timeline li[data-role="destination"] .node {
+  background: var(--brand);
+}
+
+.timeline li[data-kind="pass_through"] .node {
+  border-color: var(--text-3);
+  width: 10px;
+  height: 10px;
+  margin: 0 2px;
+}
+
+.stopText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.stopText small {
+  color: var(--text-3);
+  font-size: 0.8rem;
+}
+
+.iconDanger {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-3);
+}
+
+.iconDanger:hover {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+.addStop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px auto;
+  gap: 12px;
+  align-items: start;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.addStop > button {
+  margin-top: 22px;
+}
+
+.candidates {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.candidates li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.candidates small {
+  display: block;
+  color: var(--text-3);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mapCol {
+    position: static;
+    height: 380px;
+    min-height: 0;
+  }
+
+  .addStop {
+    grid-template-columns: 1fr;
+  }
+
+  .addStop > button {
+    margin-top: 0;
+  }
+}

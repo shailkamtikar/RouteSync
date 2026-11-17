@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Download, Plus, Ticket, Trash2, Upload } from "lucide-react";
+import { useMemo, useState, type FormEvent } from "react";
 
 import { ApiError, authedRequest, authedUpload } from "@/lib/api";
 import { describeError } from "@/lib/errors";
+import type { RouteStop } from "@/lib/types";
 import { useResource } from "@/lib/useResource";
 
+import { EmptyState } from "./kit/bits";
+import { Pill } from "./kit/StatusBadge";
+import { useToast } from "./kit/Toast";
 import ui from "./ui.module.css";
 
 type Passenger = { id: string; name: string; seat_number: string | null };
@@ -24,36 +29,51 @@ export type Booking = {
 type WriteResult = { capacity_warning: boolean };
 type ImportProblem = { line: number; error: string };
 
-const CSV_HINT = "reference,contact_name,passenger_count,pickup_stop,drop_stop";
+const CSV_HEADER = "reference,contact_name,passenger_count,pickup_stop,drop_stop";
 
 export function BookingsPanel({
   journeyId,
+  routeTemplateId,
+  capacity,
   editable,
   onChanged,
 }: {
   journeyId: string;
+  routeTemplateId: string | null;
+  capacity: number;
   editable: boolean;
   onChanged: () => void;
 }) {
+  const toast = useToast();
   const base = `/api/v1/journeys/${journeyId}/bookings`;
   const { data: bookings, error: loadError, reload, loading } = useResource<Booking[]>(base);
-  const [error, setError] = useState<string | null>(null);
+  const stopList = useResource<RouteStop[]>(
+    routeTemplateId ? `/api/v1/route-templates/${routeTemplateId}/stops` : null,
+  );
   const [problems, setProblems] = useState<ImportProblem[]>([]);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pickup, setPickup] = useState("");
+  const [showCancelled, setShowCancelled] = useState(false);
+
+  const stops = useMemo(
+    () => (stopList.data ?? []).filter((stop) => stop.kind === "passenger_stop"),
+    [stopList.data],
+  );
+  const pickupIndex = stops.findIndex((stop) => stop.name === pickup);
+  const dropOptions = pickupIndex >= 0 ? stops.slice(pickupIndex + 1) : stops;
+  const confirmed = (bookings ?? []).filter((b) => b.status === "confirmed");
+  const booked = confirmed.reduce((sum, b) => sum + b.passenger_count, 0);
+  const visible = (bookings ?? []).filter((b) => showCancelled || b.status === "confirmed");
 
   async function run(action: () => Promise<WriteResult | unknown>, done: string) {
     setBusy(true);
     setError(null);
     setProblems([]);
-    setNotice(null);
     try {
       const result = (await action()) as Partial<WriteResult> | undefined;
-      setNotice(
-        result?.capacity_warning
-          ? `${done} Total booked passengers now exceed the bus capacity.`
-          : done,
-      );
+      if (result?.capacity_warning) toast.failure(`${done} Booked passengers now exceed the bus capacity.`);
+      else toast.success(done);
       reload();
       onChanged();
       return true;
@@ -87,7 +107,10 @@ export function BookingsPanel({
         }),
       "Booking added.",
     );
-    if (ok) form.reset();
+    if (ok) {
+      form.reset();
+      setPickup("");
+    }
   }
 
   async function onImport(event: FormEvent<HTMLFormElement>) {
@@ -98,68 +121,154 @@ export function BookingsPanel({
       setError("Choose a CSV file first.");
       return;
     }
-    const ok = await run(
-      async () => authedUpload(`${base}/import`, await file.text(), "text/csv"),
-      "Bookings imported.",
-    );
+    const ok = await run(async () => authedUpload(`${base}/import`, await file.text(), "text/csv"), "Bookings imported.");
     if (ok) form.reset();
   }
 
+  function downloadSample() {
+    const first = stops[0]?.name ?? "Pune";
+    const last = stops[stops.length - 1]?.name ?? "Nanded";
+    const text = `${CSV_HEADER}\nBK-1001,Asha Patil,2,${first},${last}\n`;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([text], { type: "text/csv" }));
+    link.download = "bookings-sample.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  const fill = Math.min(100, Math.round((booked / Math.max(1, capacity)) * 100));
+
   return (
     <section className={ui.stack} aria-label="Bookings">
-      <h2>Bookings</h2>
+      <div className={ui.card}>
+        <div className={ui.spread}>
+          <div>
+            <h2 className={ui.sectionTitle}>Seats booked</h2>
+            <p className={ui.muted}>
+              {booked} of {capacity} seats · {confirmed.length} booking{confirmed.length === 1 ? "" : "s"}
+            </p>
+          </div>
+          <strong style={{ fontSize: "1.5rem", letterSpacing: "-0.03em" }}>{fill}%</strong>
+        </div>
+        <div
+          style={{ height: 8, borderRadius: 99, background: "var(--surface-3)", overflow: "hidden", marginTop: 12 }}
+          role="progressbar"
+          aria-valuenow={fill}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Seats booked"
+        >
+          <span
+            style={{
+              display: "block",
+              height: "100%",
+              width: `${fill}%`,
+              borderRadius: 99,
+              background: booked > capacity ? "var(--bad)" : fill >= 90 ? "var(--warn)" : "var(--brand)",
+            }}
+          />
+        </div>
+      </div>
+
       {editable && (
-        <>
-          <form className={`${ui.row} ${ui.card}`} onSubmit={onCreate} aria-label="Add booking">
+        <form className={`${ui.card} ${ui.stack}`} onSubmit={onCreate} aria-label="Add booking">
+          <h3 className={ui.sectionTitle}>Add a booking</h3>
+          <div className={ui.row}>
             <label className={ui.field}>
               Contact name
-              <input name="contact_name" maxLength={120} />
+              <input name="contact_name" maxLength={120} placeholder="Asha Patil" />
             </label>
-            <label className={ui.field}>
+            <label className={ui.field} style={{ width: 110 }}>
               Passengers
               <input name="passenger_count" type="number" min={1} max={100} required defaultValue={1} />
             </label>
-            <label className={ui.field}>
-              Pickup stop
-              <input name="pickup_stop_name" required maxLength={120} />
-            </label>
-            <label className={ui.field}>
-              Drop stop
-              <input name="drop_stop_name" required maxLength={120} />
-            </label>
-            <label className={ui.field}>
-              Passenger names (optional, comma separated)
-              <input name="passenger_names" />
+            {stops.length > 0 || (routeTemplateId && stopList.loading) ? (
+              <>
+                <label className={ui.field}>
+                  Pickup stop
+                  <select
+                    name="pickup_stop_name"
+                    required
+                    value={pickup}
+                    disabled={stopList.loading}
+                    onChange={(event) => setPickup(event.target.value)}
+                  >
+                    <option value="" disabled>
+                      {stopList.loading ? "Loading stops…" : "Choose…"}
+                    </option>
+                    {stops.slice(0, -1).map((stop) => (
+                      <option key={stop.id} value={stop.name}>
+                        {stop.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={ui.field}>
+                  Drop stop
+                  <select name="drop_stop_name" required defaultValue="" key={pickup} disabled={stopList.loading}>
+                    <option value="" disabled>
+                      {stopList.loading ? "Loading stops…" : "Choose…"}
+                    </option>
+                    {dropOptions.map((stop) => (
+                      <option key={stop.id} value={stop.name}>
+                        {stop.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </>
+            ) : (
+              <>
+                <label className={ui.field}>
+                  Pickup stop
+                  <input name="pickup_stop_name" required maxLength={120} />
+                </label>
+                <label className={ui.field}>
+                  Drop stop
+                  <input name="drop_stop_name" required maxLength={120} />
+                </label>
+              </>
+            )}
+            <label className={ui.field} style={{ flex: 1, minWidth: 200 }}>
+              Passenger names (optional)
+              <input name="passenger_names" placeholder="Comma separated" />
             </label>
             <button className={ui.button} type="submit" disabled={busy}>
-              Add booking
+              <Plus size={16} aria-hidden /> Add booking
             </button>
-          </form>
-          <form className={`${ui.row} ${ui.card}`} onSubmit={onImport} aria-label="Import bookings">
+          </div>
+          {stops.length === 0 && (
+            <p className={ui.hint}>Choose a route option on the Plan tab to pick stops from a list.</p>
+          )}
+        </form>
+      )}
+
+      {editable && (
+        <details className={ui.card}>
+          <summary style={{ cursor: "pointer", fontWeight: 600 }}>Import bookings from a CSV file</summary>
+          <form className={ui.row} onSubmit={onImport} aria-label="Import bookings" style={{ marginTop: 14 }}>
             <label className={ui.field}>
-              Import CSV
+              CSV file
               <input name="file" type="file" accept=".csv,text/csv" />
             </label>
             <button className={ui.buttonGhost} type="submit" disabled={busy}>
-              Import
+              <Upload size={15} aria-hidden /> Import
             </button>
-            <span className={ui.muted}>Header row: {CSV_HINT}</span>
+            <button className={ui.buttonSoft} type="button" onClick={downloadSample}>
+              <Download size={15} aria-hidden /> Sample file
+            </button>
+            <span className={ui.hint}>Header row: {CSV_HEADER}</span>
           </form>
-        </>
+        </details>
       )}
 
-      {notice && (
-        <p className={ui.muted} role="status" data-testid="bookings-notice">
-          {notice}
-        </p>
-      )}
       {(error ?? loadError) && (
-        <p className={ui.error} data-testid="bookings-error">
+        <p className={ui.error} role="alert" data-testid="bookings-error">
           {error ?? loadError}
         </p>
       )}
       {problems.length > 0 && (
-        <ul className={ui.error}>
+        <ul className={ui.error} style={{ paddingLeft: 30 }}>
           {problems.map((problem) => (
             <li key={`${problem.line}-${problem.error}`}>
               Line {problem.line}: {problem.error}
@@ -168,56 +277,60 @@ export function BookingsPanel({
         </ul>
       )}
       {loading && <p className={ui.muted}>Loading bookings…</p>}
-      {bookings && bookings.length === 0 && <p className={ui.muted}>No bookings yet.</p>}
+      {bookings && confirmed.length === 0 && (
+        <EmptyState icon={Ticket} title="No bookings yet">
+          Add the first booking above, or import a CSV file from your booking system.
+        </EmptyState>
+      )}
 
       {bookings && bookings.length > 0 && (
-        <div className={ui.tableWrap}>
-          <table className={ui.table}>
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Contact</th>
-                <th>Passengers</th>
-                <th>Pickup</th>
-                <th>Drop</th>
-                <th>Status</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td>{booking.reference}</td>
-                  <td>{booking.contact_name ?? "—"}</td>
-                  <td title={booking.passengers.map((p) => p.name).join(", ")}>
-                    {booking.passenger_count}
-                  </td>
-                  <td>{booking.pickup_stop_name}</td>
-                  <td>{booking.drop_stop_name}</td>
-                  <td>
-                    <span className={ui.badge}>{booking.status}</span>
-                  </td>
-                  <td>
-                    {editable && booking.status === "confirmed" && (
-                      <button
-                        className={ui.buttonDanger}
-                        type="button"
-                        disabled={busy}
-                        onClick={() =>
-                          run(
-                            () => authedRequest(`${base}/${booking.id}`, "DELETE"),
-                            "Booking cancelled.",
-                          )
-                        }
-                      >
-                        Cancel booking
-                      </button>
-                    )}
-                  </td>
+        <div className={ui.stackSm}>
+          <label className={ui.checkboxRow}>
+            <input type="checkbox" checked={showCancelled} onChange={(event) => setShowCancelled(event.target.checked)} />
+            Show cancelled bookings
+          </label>
+          <div className={ui.tableWrap}>
+            <table className={ui.table} aria-label="Bookings">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Contact</th>
+                  <th>Seats</th>
+                  <th>Pickup</th>
+                  <th>Drop</th>
+                  <th>Status</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {visible.map((booking) => (
+                  <tr key={booking.id}>
+                    <td className={ui.mono}>{booking.reference}</td>
+                    <td>{booking.contact_name ?? "—"}</td>
+                    <td title={booking.passengers.map((p) => p.name).join(", ")}>{booking.passenger_count}</td>
+                    <td>{booking.pickup_stop_name}</td>
+                    <td>{booking.drop_stop_name}</td>
+                    <td>
+                      <Pill tone={booking.status === "confirmed" ? "ok" : "neutral"}>{booking.status}</Pill>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {editable && booking.status === "confirmed" && (
+                        <button
+                          className={`${ui.buttonDanger} ${ui.sm}`}
+                          type="button"
+                          disabled={busy}
+                          onClick={() => run(() => authedRequest(`${base}/${booking.id}`, "DELETE"), "Booking cancelled.")}
+                          aria-label={`Cancel booking ${booking.reference}`}
+                        >
+                          <Trash2 size={14} aria-hidden /> Cancel
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </section>

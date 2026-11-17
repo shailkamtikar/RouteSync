@@ -1,0 +1,51 @@
+[
+ {"from":"Pune","to":"Nanded","options":[
+  {"name":"Via Ahilyanagar, Beed and Parbhani","via":["Ahilyanagar","Beed","Parbhani"],"stops":["Ahilyanagar","Beed","Parbhani"]},
+  {"name":"Via Baramati, Barshi and Latur","via":["Baramati","Barshi","Latur"],"stops":["Baramati","Barshi","Latur"]},
+  {"name":"Via Ahilyanagar, Chhatrapati Sambhajinagar and Jalna","via":["Ahilyanagar","Chhatrapati Sambhajinagar","Jalna","Parbhani"],"stops":["Chhatrapati Sambhajinagar","Jalna","Parbhani"]}]},
+ {"from":"Mumbai","to":"Nagpur","options":[
+  {"name":"Via Nashik, Jalgaon and Akola","via":["Nashik","Jalgaon","Akola","Amravati"],"stops":["Nashik","Jalgaon","Akola","Amravati"]},
+  {"name":"Via Nashik, Chhatrapati Sambhajinagar and Washim","via":["Nashik","Chhatrapati Sambhajinagar","Jalna","Washim","Wardha"],"stops":["Nashik","Chhatrapati Sambhajinagar","Washim","Wardha"]}]},
+ {"from":"Pune","to":"Nashik","options":[
+  {"name":"Via Narayangaon and Sangamner","via":["Narayangaon","Sangamner","Sinnar"],"stops":["Narayangaon","Sangamner","Sinnar"]},
+  {"name":"Via Ahilyanagar and Shirdi","via":["Ahilyanagar","Shirdi","Sinnar"],"stops":["Ahilyanagar","Shirdi"]}]},
+ {"from":"Mumbai","to":"Pune","options":[
+  {"name":"Expressway via Panvel and Lonavala","via":["Panvel","Lonavala"],"stops":["Panvel","Lonavala"]},
+  {"name":"Via Kalyan, Karjat and Lonavala","via":["Kalyan","Karjat","Lonavala"],"stops":["Kalyan","Karjat","Lonavala"]}]},
+ {"from":"Pune","to":"Kolhapur","options":[
+  {"name":"Via Satara and Karad","via":["Satara","Karad"],"stops":["Satara","Karad"]},
+  {"name":"Via Satara, Karad and Sangli","via":["Satara","Karad","Sangli"],"stops":["Satara","Karad","Sangli"]}]},
+ {"from":"Mumbai","to":"Kolhapur","options":[
+  {"name":"Via Pune, Satara and Karad","via":["Pune","Satara","Karad"],"stops":["Pune","Satara","Karad"]},
+  {"name":"Konkan route via Chiplun and Ratnagiri","via":["Panvel","Mahad","Chiplun","Ratnagiri"],"stops":["Mahad","Chiplun","Ratnagiri"]}]},
+ {"from":"Nagpur","to":"Chhatrapati Sambhajinagar","options":[
+  {"name":"Via Amravati, Akola and Jalna","via":["Amravati","Akola","Jalna"],"stops":["Amravati","Akola","Jalna"]},
+  {"name":"Via Yavatmal, Washim and Jalna","via":["Yavatmal","Washim","Jalna"],"stops":["Yavatmal","Washim","Jalna"]}]},
+ {"from":"Pune","to":"Solapur","options":[
+  {"name":"Via Daund and Indapur","via":["Daund","Indapur"],"stops":["Daund","Indapur"]},
+  {"name":"Via Baramati and Pandharpur","via":["Baramati","Pandharpur"],"stops":["Baramati","Pandharpur"]}]},
+ {"from":"Mumbai","to":"Nashik","options":[
+  {"name":"Via Thane and Igatpuri","via":["Thane","Igatpuri"],"stops":["Thane","Igatpuri"]},
+  {"name":"Via Kalyan and Igatpuri","via":["Kalyan","Igatpuri"],"stops":["Kalyan","Igatpuri"]}]},
+ {"from":"Nashik","to":"Nagpur","options":[
+  {"name":"Via Jalgaon, Akola and Amravati","via":["Manmad","Jalgaon","Akola","Amravati"],"stops":["Jalgaon","Akola","Amravati"]},
+  {"name":"Via Chhatrapati Sambhajinagar, Jalna and Washim","via":["Vaijapur","Chhatrapati Sambhajinagar","Jalna","Washim","Wardha"],"stops":["Chhatrapati Sambhajinagar","Jalna","Washim","Wardha"]}]},
+ {"from":"Chhatrapati Sambhajinagar","to":"Nanded","options":[
+  {"name":"Via Jalna and Parbhani","via":["Jalna","Parbhani"],"stops":["Jalna","Parbhani"]},
+  {"name":"Via Beed and Latur","via":["Paithan","Beed","Latur"],"stops":["Beed","Latur"]}]},
+ {"from":"Pune","to":"Latur","options":[
+  {"name":"Via Solapur and Dharashiv","via":["Solapur","Dharashiv"],"stops":["Solapur","Dharashiv"]},
+  {"name":"Via Baramati and Barshi","via":["Baramati","Barshi"],"stops":["Baramati","Barshi"]}]},
+ {"from":"Pune","to":"Chhatrapati Sambhajinagar","options":[
+  {"name":"Via Ahilyanagar","via":["Ahilyanagar"],"stops":["Ahilyanagar"]},
+  {"name":"Via Shirur, Ahilyanagar and Beed","via":["Shirur","Ahilyanagar","Beed"],"stops":["Ahilyanagar","Beed"]}]},
+ {"from":"Nashik","to":"Chhatrapati Sambhajinagar","options":[
+  {"name":"Via Manmad and Vaijapur","via":["Manmad","Vaijapur"],"stops":["Manmad","Vaijapur"]},
+  {"name":"Via Sinnar, Shirdi and Vaijapur","via":["Sinnar","Shirdi","Vaijapur"],"stops":["Shirdi","Vaijapur"]}]},
+ {"from":"Pune","to":"Shirdi","options":[
+  {"name":"Via Shirur and Ahilyanagar","via":["Shirur","Ahilyanagar"],"stops":["Shirur","Ahilyanagar"]},
+  {"name":"Via Narayangaon and Sangamner","via":["Narayangaon","Sangamner"],"stops":["Narayangaon","Sangamner"]}]},
+ {"from":"Nanded","to":"Nagpur","options":[
+  {"name":"Via Pusad and Yavatmal","via":["Pusad","Yavatmal"],"stops":["Pusad","Yavatmal"]},
+  {"name":"Via Hingoli, Washim and Amravati","via":["Hingoli","Washim","Amravati","Wardha"],"stops":["Hingoli","Washim","Amravati","Wardha"]}]}
+]

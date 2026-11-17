@@ -3,6 +3,7 @@ import json
 import httpx
 import pytest
 
+from app.optimizer.models import Tolerances
 from app.providers.routing.base import (
     RoutingInvalidRequest,
     RoutingQuotaExceeded,
@@ -101,6 +102,9 @@ def test_ors_parses_route_and_sends_ordered_waypoints():
     assert len(route.legs) == 2
     assert route.waypoint_indices == [0, 1, 2]
     assert seen["body"]["instructions"] is True
+    # Every point may snap to a road, but never farther than the optimiser accepts for a stop.
+    assert seen["body"]["radiuses"] == [900, 900, 900]
+    assert max(seen["body"]["radiuses"]) < Tolerances().stop_m
     assert route.provider == "openrouteservice"
     assert "OpenStreetMap" in route.metadata["attribution"]
 

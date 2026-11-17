@@ -1,7 +1,7 @@
 """End-to-end auth smoke test against a running local API and the dev Supabase project.
 
 Signs each seeded user in with the password grant, then calls GET /api/v1/me.
-Usage: start the API on :8000, then run this script with the API virtualenv.
+Usage: start the API on :8010, then run this script with the API virtualenv.
 """
 
 import json
@@ -15,7 +15,7 @@ from dotenv import dotenv_values
 ROOT = Path(__file__).resolve().parents[1]
 api_env = dotenv_values(ROOT / "apps" / "api" / ".env")
 web_env = dotenv_values(ROOT / "apps" / "web" / ".env.local")
-API = "http://127.0.0.1:8000"
+API = "http://127.0.0.1:8010"
 
 EXPECTED = {
     "owner1@routesync.test": ("Shivneri Travels", "owner"),

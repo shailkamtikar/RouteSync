@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { API, createDemoJourney, gpsPoint } from "./demo";
-import { signInAndWait, USERS } from "./helpers";
+import { API, createDemoJourney, onRoute } from "./demo";
+import { signInAndWait, stopItem, USERS } from "./helpers";
 
 /**
  * The whole product in one run: a second journey on the same route option stays isolated,
@@ -16,24 +16,23 @@ test("golden journey from boarding to completion", async ({ page, request, conte
   const deviceB = { Authorization: `Bearer ${b.device_token}` };
 
   // Each device token only moves its own journey.
-  expect((await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [gpsPoint(18.5204, 73.8567)] } })).status()).toBe(202);
-  expect((await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceB, data: { points: [gpsPoint(19.0948, 74.7496)] } })).status()).toBe(202);
+  expect((await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [onRoute(a, 5)] } })).status()).toBe(202);
+  expect((await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceB, data: { points: [onRoute(b, 25)] } })).status()).toBe(202);
   const viewA = await (await request.get(`${API}/api/v1/public/track/${a.tracking_url!.split("/track/")[1]}`)).json();
   const viewB = await (await request.get(`${API}/api/v1/public/track/${b.tracking_url!.split("/track/")[1]}`)).json();
-  expect(viewA.bus.lat).toBeCloseTo(18.5204, 2);
-  expect(viewB.bus.lat).toBeCloseTo(19.0948, 2);
+  expect(viewA.bus.lat).toBeCloseTo(a.route_positions["5"].lat, 3);
+  expect(viewB.bus.lat).toBeCloseTo(b.route_positions["25"].lat, 3);
 
   // Operator works journey A.
   const operator = await context.newPage();
-  await signInAndWait(operator, USERS.owner1);
+  await signInAndWait(operator, USERS.owner2);
   await operator.goto(a.monitor_url);
-  const events = operator.getByRole("table", { name: "Stop events" });
-  const row = (name: string) => events.getByRole("row", { name: new RegExp(name) });
+  const row = (name: string) => stopItem(operator, name);
   await row("Pune").getByRole("button", { name: "Arrived" }).click();
   await row("Pune").getByLabel("Passenger count at Pune").fill("5");
   await row("Pune").getByRole("button", { name: "Boarded" }).click();
   await row("Pune").getByRole("button", { name: "Departed" }).click();
-  await expect(operator.getByTestId("monitor-status")).toHaveText("in progress");
+  await expect(operator.getByTestId("monitor-status")).toContainText("In progress");
 
   // Passenger follows A and asks the assistant.
   await page.goto(a.tracking_url!);
@@ -43,16 +42,16 @@ test("golden journey from boarding to completion", async ({ page, request, conte
   await expect(page.getByTestId("companion-log")).toContainText(/Beed|2|two/, { timeout: 60_000 });
 
   // The bus reaches Beed, then Nanded; the journey completes.
-  await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [gpsPoint(18.9891, 75.7601)] } });
+  await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [onRoute(a, 55)] } });
   await row("Beed").getByRole("button", { name: "Arrived" }).click();
   await row("Beed").getByLabel("Passenger count at Beed").fill("3");
   await row("Beed").getByRole("button", { name: "Alighted" }).click();
   await expect(operator.getByTestId("onboard-card").locator("strong")).toHaveText("2");
   await row("Beed").getByRole("button", { name: "Departed" }).click();
-  await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [gpsPoint(19.1383, 77.321)] } });
+  await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [onRoute(a, 98)] } });
   await row("Nanded").getByRole("button", { name: "Arrived" }).click();
   await row("Nanded").getByRole("button", { name: "Finish journey" }).click();
-  await expect(operator.getByTestId("monitor-status")).toHaveText("completed");
+  await expect(operator.getByTestId("monitor-status")).toContainText("Completed");
 
   await expect(page.getByTestId("journey-status")).toContainText("Journey completed", { timeout: 25_000 });
   await expect(page.getByTestId("finished-card")).toBeVisible();
@@ -63,5 +62,5 @@ test("golden journey from boarding to completion", async ({ page, request, conte
   expect(afterB.stops.every((s: { status: string }) => s.status !== "completed")).toBe(true);
 
   // A completed journey no longer accepts positions.
-  expect((await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [gpsPoint(19.14, 77.32)] } })).status()).toBe(409);
+  expect((await request.post(`${API}/api/v1/ingest/gps`, { headers: deviceA, data: { points: [onRoute(a, 98)] } })).status()).toBe(409);
 });

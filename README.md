@@ -21,10 +21,11 @@ Next.js (TypeScript) on Vercel · FastAPI (Python 3.12) on Render · Supabase Po
 ## Repository
 
 ```
-apps/web        Next.js app: operator dashboard, public tracking page, Companion panel
+apps/web        Next.js app: operator dashboard, public tracking page, Companion panel;
+                src/data holds the Maharashtra place catalog and named road corridors
 apps/api        FastAPI service: domain logic, optimizer, ETA engine, providers, Companion
 supabase        SQL migrations (schema, RLS, triggers, retention)
-scripts         seed_dev.py, demo_setup.py, gps_simulator.py, retention.py, reset_dev_data.py
+scripts         seed_dev.py, seed_network.py, demo_setup.py, fleet_simulator.py, gps_simulator.py, build_places.py, retention.py, reset_dev_data.py
 docs            Knowledge document, playbook, ADRs, ERD, scenarios, edge cases, security, runbooks, eval reports
 .github         CI (api-tests, web-tests), keep-alive and retention schedules
 ```
@@ -43,14 +44,14 @@ cp .env.example apps/web/.env.local    # keep only the NEXT_PUBLIC_* values here
 cd apps/api && python -m venv .venv && .venv/Scripts/pip install -r requirements-dev.txt
 npx supabase db push --remote="$DATABASE_URL"       # apply migrations
 .venv/Scripts/python ../../scripts/seed_dev.py       # test operators and users
-.venv/Scripts/python -m uvicorn app.main:app --port 8000
+.venv/Scripts/python -m uvicorn app.main:app --port 8010
 ```
 
 ```bash
 cd apps/web && npm install && npm run dev            # http://localhost:3000
 ```
 
-Sign in as `owner1@routesync.test` with the password that `seed_dev.py` wrote to `apps/api/.env` (`SEED_USER_PASSWORD`).
+Sign in as `owner1@routesync.test` with the password that `seed_dev.py` wrote to `apps/api/.env` (`SEED_USER_PASSWORD`). `owner2@routesync.test` belongs to a second operator that the browser tests use, so they never touch the first operator's network.
 
 ### Environment variables
 
@@ -69,11 +70,14 @@ Never commit `.env` files; only `.env.example` is tracked.
 ## Running a demo
 
 ```bash
-apps/api/.venv/Scripts/python scripts/demo_setup.py --status boarding --out demo.json
-apps/api/.venv/Scripts/python scripts/gps_simulator.py --token <device token from demo.json> --speed 40
+apps/api/.venv/Scripts/python scripts/seed_network.py       # once: 16 services, 33 route options, 20 buses, 20 journeys
+apps/api/.venv/Scripts/python scripts/fleet_simulator.py    # keeps every bus that is on the road moving
+apps/api/.venv/Scripts/python scripts/demo_setup.py --out demo.json
 ```
 
-`demo.json` holds the monitor URL, the public tracking URL and the device token. The full walkthrough is in `docs/demo-script.md`.
+The network covers Mumbai, Pune, Nagpur, Nashik, Chhatrapati Sambhajinagar, Kolhapur, Solapur, Amravati, Nanded and the towns between them. Every service has at least two different roads, and journeys exist in every state from draft to completed. `demo_setup.py` reuses a seeded journey and writes the monitor URL, the public tracking URL and the device token to `demo.json`. The full walkthrough is in `docs/demo-script.md`.
+
+The API runs on port 8010 and the web app on 3000, so they can sit beside other local projects that use 8000.
 
 ## Tests
 
@@ -92,7 +96,7 @@ CI runs lint, type checks, unit tests and the web build on every push.
 - `docs/RouteSync_Knowledge.md`: product requirements (the source of truth)
 - `docs/RouteSync_Playbook.md`: phase-by-phase development playbook
 - `docs/adr/`: decisions on database access, tiles, routing and the assistant model
-- `docs/scenarios.md`, `docs/edge-cases.md`, `docs/security.md`, `docs/perf.md`
+- `docs/design.md`, `docs/scenarios.md`, `docs/edge-cases.md`, `docs/security.md`, `docs/perf.md`
 - `docs/runbooks/`: deploy, incident, rollback
 - `docs/eval/report.md`: the assistant's latest live evaluation
 

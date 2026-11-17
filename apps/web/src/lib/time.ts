@@ -59,3 +59,24 @@ export function formatDuration(totalSeconds: number): string {
   const rest = minutes % 60;
   return hours > 0 ? `${hours} h ${String(rest).padStart(2, "0")} min` : `${rest} min`;
 }
+
+/** "Today 18:30", "Tomorrow 06:00", "Yesterday 22:10" or "21 Nov, 09:00" in the given zone. */
+export function formatDay(iso: string, timeZone: string, now = new Date()): string {
+  const dayKey = (date: Date) =>
+    new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+  const when = new Date(iso);
+  const dayDiff = Math.round(
+    (Date.parse(dayKey(when)) - Date.parse(dayKey(now))) / 86_400_000,
+  );
+  const clock = formatClock(iso, timeZone);
+  if (dayDiff === 0) return `Today ${clock}`;
+  if (dayDiff === 1) return `Tomorrow ${clock}`;
+  if (dayDiff === -1) return `Yesterday ${clock}`;
+  const date = new Intl.DateTimeFormat("en-GB", { timeZone, day: "numeric", month: "short" }).format(when);
+  return `${date}, ${clock}`;
+}
+
+/** Kilometres from metres: "458 km". */
+export function km(metres: number | null | undefined): string {
+  return metres === null || metres === undefined ? "—" : `${Math.round(metres / 1000)} km`;
+}

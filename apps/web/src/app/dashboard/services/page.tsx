@@ -1,10 +1,9 @@
-import { ServicesPanel } from "@/components/ServicesPanel";
+import type { Metadata } from "next";
+
+import { ServicesPanel } from "@/components/services/ServicesPanel";
+
+export const metadata: Metadata = { title: "Services" };
 
 export default function ServicesPage() {
-  return (
-    <>
-      <h1>Services</h1>
-      <ServicesPanel />
-    </>
-  );
+  return <ServicesPanel />;
 }

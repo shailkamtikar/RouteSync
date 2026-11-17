@@ -13,13 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RouteSync",
+  title: { default: "RouteSync", template: "%s · RouteSync" },
   description: "Bus journey management, route optimization and live tracking",
 };
 
+// Applies a saved theme before the first paint so there is no flash.
+const THEME_SCRIPT = `try{var t=localStorage.getItem("routesync-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

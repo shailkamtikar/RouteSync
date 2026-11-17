@@ -1,0 +1,1784 @@
+[
+ {
+  "name": "Mumbai",
+  "district": "Mumbai",
+  "lat": 19.076,
+  "lng": 72.8777,
+  "tier": 1,
+  "aliases": [
+   "Bombay"
+  ]
+ },
+ {
+  "name": "Pune",
+  "district": "Pune",
+  "lat": 18.5204,
+  "lng": 73.8567,
+  "tier": 1,
+  "aliases": [
+   "Poona"
+  ]
+ },
+ {
+  "name": "Nagpur",
+  "district": "Nagpur",
+  "lat": 21.1458,
+  "lng": 79.0882,
+  "tier": 1,
+  "aliases": []
+ },
+ {
+  "name": "Nashik",
+  "district": "Nashik",
+  "lat": 19.9975,
+  "lng": 73.7898,
+  "tier": 1,
+  "aliases": [
+   "Nasik"
+  ]
+ },
+ {
+  "name": "Chhatrapati Sambhajinagar",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 19.8762,
+  "lng": 75.3433,
+  "tier": 1,
+  "aliases": [
+   "Aurangabad"
+  ]
+ },
+ {
+  "name": "Kolhapur",
+  "district": "Kolhapur",
+  "lat": 16.705,
+  "lng": 74.2433,
+  "tier": 1,
+  "aliases": []
+ },
+ {
+  "name": "Solapur",
+  "district": "Solapur",
+  "lat": 17.6599,
+  "lng": 75.9064,
+  "tier": 1,
+  "aliases": [
+   "Sholapur"
+  ]
+ },
+ {
+  "name": "Amravati",
+  "district": "Amravati",
+  "lat": 20.932,
+  "lng": 77.7523,
+  "tier": 1,
+  "aliases": []
+ },
+ {
+  "name": "Nanded",
+  "district": "Nanded",
+  "lat": 19.1383,
+  "lng": 77.321,
+  "tier": 1,
+  "aliases": []
+ },
+ {
+  "name": "Thane",
+  "district": "Thane",
+  "lat": 19.2183,
+  "lng": 72.9781,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Kalyan",
+  "district": "Thane",
+  "lat": 19.2437,
+  "lng": 73.1355,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Panvel",
+  "district": "Raigad",
+  "lat": 18.9894,
+  "lng": 73.1175,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Lonavala",
+  "district": "Pune",
+  "lat": 18.7557,
+  "lng": 73.4091,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Karjat",
+  "district": "Raigad",
+  "lat": 18.91,
+  "lng": 73.32,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Khopoli",
+  "district": "Raigad",
+  "lat": 18.785,
+  "lng": 73.345,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Alibag",
+  "district": "Raigad",
+  "lat": 18.6414,
+  "lng": 72.8722,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mahad",
+  "district": "Raigad",
+  "lat": 18.0833,
+  "lng": 73.4167,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Chiplun",
+  "district": "Ratnagiri",
+  "lat": 17.53,
+  "lng": 73.515,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ratnagiri",
+  "district": "Ratnagiri",
+  "lat": 16.9902,
+  "lng": 73.312,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Narayangaon",
+  "district": "Pune",
+  "lat": 19.12,
+  "lng": 73.97,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shirur",
+  "district": "Pune",
+  "lat": 18.83,
+  "lng": 74.38,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Daund",
+  "district": "Pune",
+  "lat": 18.46,
+  "lng": 74.58,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Indapur",
+  "district": "Pune",
+  "lat": 18.1167,
+  "lng": 75.0167,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Baramati",
+  "district": "Pune",
+  "lat": 18.1517,
+  "lng": 74.5777,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Satara",
+  "district": "Satara",
+  "lat": 17.6805,
+  "lng": 74.0183,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Karad",
+  "district": "Satara",
+  "lat": 17.289,
+  "lng": 74.181,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Phaltan",
+  "district": "Satara",
+  "lat": 17.9833,
+  "lng": 74.4333,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sangli",
+  "district": "Sangli",
+  "lat": 16.8524,
+  "lng": 74.5815,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Miraj",
+  "district": "Sangli",
+  "lat": 16.822,
+  "lng": 74.647,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ichalkaranji",
+  "district": "Kolhapur",
+  "lat": 16.691,
+  "lng": 74.46,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pandharpur",
+  "district": "Solapur",
+  "lat": 17.6792,
+  "lng": 75.332,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Barshi",
+  "district": "Solapur",
+  "lat": 18.2333,
+  "lng": 75.6933,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Dharashiv",
+  "district": "Dharashiv",
+  "lat": 18.186,
+  "lng": 76.0419,
+  "tier": 2,
+  "aliases": [
+   "Osmanabad"
+  ]
+ },
+ {
+  "name": "Tuljapur",
+  "district": "Dharashiv",
+  "lat": 18.0069,
+  "lng": 76.07,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Latur",
+  "district": "Latur",
+  "lat": 18.4088,
+  "lng": 76.5604,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Udgir",
+  "district": "Latur",
+  "lat": 18.3933,
+  "lng": 77.1167,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ahilyanagar",
+  "district": "Ahilyanagar",
+  "lat": 19.0952,
+  "lng": 74.7496,
+  "tier": 2,
+  "aliases": [
+   "Ahmednagar"
+  ]
+ },
+ {
+  "name": "Sangamner",
+  "district": "Ahilyanagar",
+  "lat": 19.5667,
+  "lng": 74.2167,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shirdi",
+  "district": "Ahilyanagar",
+  "lat": 19.7667,
+  "lng": 74.4769,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kopargaon",
+  "district": "Ahilyanagar",
+  "lat": 19.8833,
+  "lng": 74.4833,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Newasa",
+  "district": "Ahilyanagar",
+  "lat": 19.55,
+  "lng": 75.01,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sinnar",
+  "district": "Nashik",
+  "lat": 19.85,
+  "lng": 74.0,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Igatpuri",
+  "district": "Nashik",
+  "lat": 19.695,
+  "lng": 73.563,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Manmad",
+  "district": "Nashik",
+  "lat": 20.25,
+  "lng": 74.4333,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Yeola",
+  "district": "Nashik",
+  "lat": 20.0417,
+  "lng": 74.4889,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Malegaon",
+  "district": "Nashik",
+  "lat": 20.5579,
+  "lng": 74.5089,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Vaijapur",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 19.9167,
+  "lng": 74.7333,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Paithan",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 19.48,
+  "lng": 75.38,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jalna",
+  "district": "Jalna",
+  "lat": 19.8347,
+  "lng": 75.8816,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Parbhani",
+  "district": "Parbhani",
+  "lat": 19.2704,
+  "lng": 76.7747,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Beed",
+  "district": "Beed",
+  "lat": 18.9891,
+  "lng": 75.7601,
+  "tier": 2,
+  "aliases": [
+   "Bid"
+  ]
+ },
+ {
+  "name": "Georai",
+  "district": "Beed",
+  "lat": 19.2667,
+  "lng": 75.75,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Majalgaon",
+  "district": "Beed",
+  "lat": 19.15,
+  "lng": 76.2167,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Parli",
+  "district": "Beed",
+  "lat": 18.85,
+  "lng": 76.5333,
+  "tier": 3,
+  "aliases": [
+   "Parli Vaijnath"
+  ]
+ },
+ {
+  "name": "Ambajogai",
+  "district": "Beed",
+  "lat": 18.7333,
+  "lng": 76.3833,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Hingoli",
+  "district": "Hingoli",
+  "lat": 19.7167,
+  "lng": 77.15,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pusad",
+  "district": "Yavatmal",
+  "lat": 19.91,
+  "lng": 77.57,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Yavatmal",
+  "district": "Yavatmal",
+  "lat": 20.3899,
+  "lng": 78.1307,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Washim",
+  "district": "Washim",
+  "lat": 20.1,
+  "lng": 77.1333,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Akola",
+  "district": "Akola",
+  "lat": 20.7002,
+  "lng": 77.0082,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Khamgaon",
+  "district": "Buldhana",
+  "lat": 20.7,
+  "lng": 76.5667,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Buldhana",
+  "district": "Buldhana",
+  "lat": 20.5333,
+  "lng": 76.1833,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jalgaon",
+  "district": "Jalgaon",
+  "lat": 21.0077,
+  "lng": 75.5626,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Bhusawal",
+  "district": "Jalgaon",
+  "lat": 21.0436,
+  "lng": 75.785,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Dhule",
+  "district": "Dhule",
+  "lat": 20.9042,
+  "lng": 74.7749,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Nandurbar",
+  "district": "Nandurbar",
+  "lat": 21.37,
+  "lng": 74.24,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Wardha",
+  "district": "Wardha",
+  "lat": 20.7453,
+  "lng": 78.6022,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Chandrapur",
+  "district": "Chandrapur",
+  "lat": 19.9615,
+  "lng": 79.2961,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Bhandara",
+  "district": "Bhandara",
+  "lat": 21.167,
+  "lng": 79.65,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Gondia",
+  "district": "Gondia",
+  "lat": 21.4624,
+  "lng": 80.192,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ramtek",
+  "district": "Nagpur",
+  "lat": 21.39,
+  "lng": 79.33,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Gadchiroli",
+  "district": "Gadchiroli",
+  "lat": 20.18,
+  "lng": 80.0,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Vasai",
+  "district": "Palghar",
+  "lat": 19.3428,
+  "lng": 72.8054,
+  "tier": 2,
+  "aliases": [
+   "Vasai-Virar",
+   "Virar"
+  ]
+ },
+ {
+  "name": "Bhiwandi",
+  "district": "Thane",
+  "lat": 19.3026,
+  "lng": 73.0588,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Ulhasnagar",
+  "district": "Thane",
+  "lat": 19.2236,
+  "lng": 73.1672,
+  "tier": 2,
+  "aliases": []
+ },
+ {
+  "name": "Ambernath",
+  "district": "Thane",
+  "lat": 19.2016,
+  "lng": 73.2005,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Badlapur",
+  "district": "Thane",
+  "lat": 19.1676,
+  "lng": 73.2384,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Navi Mumbai",
+  "district": "Thane",
+  "lat": 19.0308,
+  "lng": 73.0199,
+  "tier": 2,
+  "aliases": [
+   "Vashi"
+  ]
+ },
+ {
+  "name": "Palghar",
+  "district": "Palghar",
+  "lat": 19.6967,
+  "lng": 72.7695,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Dahanu",
+  "district": "Palghar",
+  "lat": 19.9887,
+  "lng": 72.7338,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Boisar",
+  "district": "Palghar",
+  "lat": 19.7984,
+  "lng": 72.7607,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jawhar",
+  "district": "Palghar",
+  "lat": 19.9125,
+  "lng": 73.2252,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pen",
+  "district": "Raigad",
+  "lat": 18.7362,
+  "lng": 73.095,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Murud",
+  "district": "Raigad",
+  "lat": 18.322,
+  "lng": 72.9605,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Roha",
+  "district": "Raigad",
+  "lat": 18.4357,
+  "lng": 73.1196,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mangaon",
+  "district": "Raigad",
+  "lat": 18.2382,
+  "lng": 73.2821,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Dapoli",
+  "district": "Ratnagiri",
+  "lat": 17.758,
+  "lng": 73.1887,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Khed",
+  "district": "Ratnagiri",
+  "lat": 17.7184,
+  "lng": 73.396,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Guhagar",
+  "district": "Ratnagiri",
+  "lat": 17.4838,
+  "lng": 73.1911,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Rajapur",
+  "district": "Ratnagiri",
+  "lat": 16.6533,
+  "lng": 73.5149,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Lanja",
+  "district": "Ratnagiri",
+  "lat": 16.859,
+  "lng": 73.5487,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sawantwadi",
+  "district": "Sindhudurg",
+  "lat": 15.908,
+  "lng": 73.8205,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kudal",
+  "district": "Sindhudurg",
+  "lat": 16.0088,
+  "lng": 73.6872,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kankavli",
+  "district": "Sindhudurg",
+  "lat": 16.3742,
+  "lng": 73.7452,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Malvan",
+  "district": "Sindhudurg",
+  "lat": 16.0606,
+  "lng": 73.4669,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Vengurla",
+  "district": "Sindhudurg",
+  "lat": 15.862,
+  "lng": 73.6322,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Devgad",
+  "district": "Sindhudurg",
+  "lat": 16.377,
+  "lng": 73.3796,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pimpri-Chinchwad",
+  "district": "Pune",
+  "lat": 18.6279,
+  "lng": 73.801,
+  "tier": 2,
+  "aliases": [
+   "Pimpri",
+   "Chinchwad"
+  ]
+ },
+ {
+  "name": "Jejuri",
+  "district": "Pune",
+  "lat": 18.2769,
+  "lng": 74.1602,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Saswad",
+  "district": "Pune",
+  "lat": 18.3444,
+  "lng": 74.0295,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Bhor",
+  "district": "Pune",
+  "lat": 18.2128,
+  "lng": 73.8164,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Talegaon Dabhade",
+  "district": "Pune",
+  "lat": 18.7337,
+  "lng": 73.6729,
+  "tier": 3,
+  "aliases": [
+   "Talegaon"
+  ]
+ },
+ {
+  "name": "Chakan",
+  "district": "Pune",
+  "lat": 18.7623,
+  "lng": 73.8625,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Rajgurunagar",
+  "district": "Pune",
+  "lat": 18.8555,
+  "lng": 73.8864,
+  "tier": 3,
+  "aliases": [
+   "Khed Pune"
+  ]
+ },
+ {
+  "name": "Junnar",
+  "district": "Pune",
+  "lat": 19.2007,
+  "lng": 73.9768,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Manchar",
+  "district": "Pune",
+  "lat": 19.0033,
+  "lng": 73.9427,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Wai",
+  "district": "Satara",
+  "lat": 17.9424,
+  "lng": 73.9193,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mahabaleshwar",
+  "district": "Satara",
+  "lat": 17.9243,
+  "lng": 73.6576,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Panchgani",
+  "district": "Satara",
+  "lat": 17.924,
+  "lng": 73.7993,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Koregaon",
+  "district": "Satara",
+  "lat": 17.7005,
+  "lng": 74.158,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Patan",
+  "district": "Satara",
+  "lat": 17.3565,
+  "lng": 73.8634,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Vaduj",
+  "district": "Satara",
+  "lat": 17.5951,
+  "lng": 74.4505,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Islampur",
+  "district": "Sangli",
+  "lat": 17.0502,
+  "lng": 74.2662,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Tasgaon",
+  "district": "Sangli",
+  "lat": 17.0905,
+  "lng": 74.6833,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Vita",
+  "district": "Sangli",
+  "lat": 17.272,
+  "lng": 74.5373,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jath",
+  "district": "Sangli",
+  "lat": 17.049,
+  "lng": 75.2177,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kagal",
+  "district": "Kolhapur",
+  "lat": 16.5751,
+  "lng": 74.3153,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Gadhinglaj",
+  "district": "Kolhapur",
+  "lat": 16.1409,
+  "lng": 74.4037,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jaysingpur",
+  "district": "Kolhapur",
+  "lat": 16.779,
+  "lng": 74.5564,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Radhanagari",
+  "district": "Kolhapur",
+  "lat": 16.4278,
+  "lng": 73.9862,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ajra",
+  "district": "Kolhapur",
+  "lat": 16.1577,
+  "lng": 74.1881,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Chandgad",
+  "district": "Kolhapur",
+  "lat": 15.9014,
+  "lng": 74.2406,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Akkalkot",
+  "district": "Solapur",
+  "lat": 17.5152,
+  "lng": 76.2123,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mangalvedha",
+  "district": "Solapur",
+  "lat": 17.5231,
+  "lng": 75.4448,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Karmala",
+  "district": "Solapur",
+  "lat": 18.3214,
+  "lng": 75.1169,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sangola",
+  "district": "Solapur",
+  "lat": 17.4368,
+  "lng": 75.1882,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mohol",
+  "district": "Solapur",
+  "lat": 17.771,
+  "lng": 75.6435,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Akluj",
+  "district": "Solapur",
+  "lat": 17.893,
+  "lng": 75.0204,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Satana",
+  "district": "Nashik",
+  "lat": 20.5991,
+  "lng": 74.2021,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Niphad",
+  "district": "Nashik",
+  "lat": 20.0797,
+  "lng": 74.1071,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Dindori",
+  "district": "Nashik",
+  "lat": 20.2037,
+  "lng": 73.8326,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Trimbakeshwar",
+  "district": "Nashik",
+  "lat": 19.9864,
+  "lng": 73.5171,
+  "tier": 3,
+  "aliases": [
+   "Trimbak"
+  ]
+ },
+ {
+  "name": "Nandgaon",
+  "district": "Nashik",
+  "lat": 20.3079,
+  "lng": 74.6572,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Chandwad",
+  "district": "Nashik",
+  "lat": 20.2781,
+  "lng": 74.2129,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Lasalgaon",
+  "district": "Nashik",
+  "lat": 20.1427,
+  "lng": 74.2378,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shirpur",
+  "district": "Dhule",
+  "lat": 21.3528,
+  "lng": 74.8842,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sakri",
+  "district": "Dhule",
+  "lat": 20.9911,
+  "lng": 74.3154,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shahada",
+  "district": "Nandurbar",
+  "lat": 21.5409,
+  "lng": 74.4717,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Chalisgaon",
+  "district": "Jalgaon",
+  "lat": 20.5024,
+  "lng": 74.9656,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pachora",
+  "district": "Jalgaon",
+  "lat": 20.6563,
+  "lng": 75.4011,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Amalner",
+  "district": "Jalgaon",
+  "lat": 21.0758,
+  "lng": 75.0429,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jamner",
+  "district": "Jalgaon",
+  "lat": 20.7323,
+  "lng": 75.8024,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Raver",
+  "district": "Jalgaon",
+  "lat": 21.2269,
+  "lng": 75.9986,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Yawal",
+  "district": "Jalgaon",
+  "lat": 21.226,
+  "lng": 75.6951,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Erandol",
+  "district": "Jalgaon",
+  "lat": 20.8674,
+  "lng": 75.352,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Muktainagar",
+  "district": "Jalgaon",
+  "lat": 21.086,
+  "lng": 76.0653,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shrirampur",
+  "district": "Ahilyanagar",
+  "lat": 19.642,
+  "lng": 74.7007,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Rahuri",
+  "district": "Ahilyanagar",
+  "lat": 19.4032,
+  "lng": 74.6106,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shevgaon",
+  "district": "Ahilyanagar",
+  "lat": 19.3797,
+  "lng": 75.2955,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pathardi",
+  "district": "Ahilyanagar",
+  "lat": 19.1717,
+  "lng": 75.1746,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jamkhed",
+  "district": "Ahilyanagar",
+  "lat": 18.6688,
+  "lng": 75.3524,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Parner",
+  "district": "Ahilyanagar",
+  "lat": 19.0932,
+  "lng": 74.3941,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Akole",
+  "district": "Ahilyanagar",
+  "lat": 19.5419,
+  "lng": 74.0093,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sillod",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 20.3549,
+  "lng": 75.6105,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Gangapur",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 19.7954,
+  "lng": 75.0667,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Khuldabad",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 20.0902,
+  "lng": 75.2158,
+  "tier": 3,
+  "aliases": [
+   "Ellora"
+  ]
+ },
+ {
+  "name": "Kannad",
+  "district": "Chhatrapati Sambhajinagar",
+  "lat": 20.2455,
+  "lng": 75.1438,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ashti",
+  "district": "Beed",
+  "lat": 18.8875,
+  "lng": 75.0655,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kaij",
+  "district": "Beed",
+  "lat": 18.7231,
+  "lng": 76.0379,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Dharur",
+  "district": "Beed",
+  "lat": 18.8827,
+  "lng": 76.1366,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Bhokardan",
+  "district": "Jalna",
+  "lat": 20.2928,
+  "lng": 75.804,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Partur",
+  "district": "Jalna",
+  "lat": 19.4883,
+  "lng": 76.2607,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ambad",
+  "district": "Jalna",
+  "lat": 19.5654,
+  "lng": 75.7757,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Selu",
+  "district": "Parbhani",
+  "lat": 19.4549,
+  "lng": 76.4388,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pathri",
+  "district": "Parbhani",
+  "lat": 19.2195,
+  "lng": 76.4284,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Jintur",
+  "district": "Parbhani",
+  "lat": 19.6109,
+  "lng": 76.7438,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Gangakhed",
+  "district": "Parbhani",
+  "lat": 18.9131,
+  "lng": 76.7557,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Basmat",
+  "district": "Hingoli",
+  "lat": 19.3267,
+  "lng": 77.1575,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kalamnuri",
+  "district": "Hingoli",
+  "lat": 19.5723,
+  "lng": 77.3475,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ausa",
+  "district": "Latur",
+  "lat": 18.251,
+  "lng": 76.501,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Nilanga",
+  "district": "Latur",
+  "lat": 18.0838,
+  "lng": 76.7992,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ahmedpur",
+  "district": "Latur",
+  "lat": 18.6448,
+  "lng": 76.9347,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kinwat",
+  "district": "Nanded",
+  "lat": 19.5775,
+  "lng": 78.244,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Bhokar",
+  "district": "Nanded",
+  "lat": 19.1948,
+  "lng": 77.6834,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Deglur",
+  "district": "Nanded",
+  "lat": 18.468,
+  "lng": 77.4999,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mukhed",
+  "district": "Nanded",
+  "lat": 18.5754,
+  "lng": 77.3839,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Biloli",
+  "district": "Nanded",
+  "lat": 18.7653,
+  "lng": 77.6968,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Hadgaon",
+  "district": "Nanded",
+  "lat": 19.4786,
+  "lng": 77.6068,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kandhar",
+  "district": "Nanded",
+  "lat": 18.8425,
+  "lng": 77.2511,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Omerga",
+  "district": "Dharashiv",
+  "lat": 17.8365,
+  "lng": 76.625,
+  "tier": 3,
+  "aliases": [
+   "Omerga"
+  ]
+ },
+ {
+  "name": "Paranda",
+  "district": "Dharashiv",
+  "lat": 18.2683,
+  "lng": 75.4508,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Bhum",
+  "district": "Dharashiv",
+  "lat": 18.5493,
+  "lng": 75.6191,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Katol",
+  "district": "Nagpur",
+  "lat": 21.2752,
+  "lng": 78.5866,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Kamptee",
+  "district": "Nagpur",
+  "lat": 21.2171,
+  "lng": 79.1964,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Umred",
+  "district": "Nagpur",
+  "lat": 20.8485,
+  "lng": 79.2305,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Savner",
+  "district": "Nagpur",
+  "lat": 21.432,
+  "lng": 78.8876,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Achalpur",
+  "district": "Amravati",
+  "lat": 21.2408,
+  "lng": 77.4278,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Daryapur",
+  "district": "Amravati",
+  "lat": 20.9645,
+  "lng": 77.334,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Warud",
+  "district": "Amravati",
+  "lat": 21.4714,
+  "lng": 78.2829,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Morshi",
+  "district": "Amravati",
+  "lat": 21.2799,
+  "lng": 77.9448,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Chikhaldara",
+  "district": "Amravati",
+  "lat": 21.4764,
+  "lng": 77.2758,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Akot",
+  "district": "Akola",
+  "lat": 21.0475,
+  "lng": 77.0553,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Balapur",
+  "district": "Akola",
+  "lat": 20.7327,
+  "lng": 76.8363,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mangrulpir",
+  "district": "Washim",
+  "lat": 20.2759,
+  "lng": 77.3261,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Karanja",
+  "district": "Washim",
+  "lat": 20.4821,
+  "lng": 77.4892,
+  "tier": 3,
+  "aliases": [
+   "Karanja Lad"
+  ]
+ },
+ {
+  "name": "Chikhli",
+  "district": "Buldhana",
+  "lat": 20.3439,
+  "lng": 76.3229,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Mehkar",
+  "district": "Buldhana",
+  "lat": 20.2547,
+  "lng": 76.6333,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Malkapur",
+  "district": "Buldhana",
+  "lat": 20.8931,
+  "lng": 76.2057,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Shegaon",
+  "district": "Buldhana",
+  "lat": 20.7936,
+  "lng": 76.6497,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Hinganghat",
+  "district": "Wardha",
+  "lat": 20.4752,
+  "lng": 78.7424,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Arvi",
+  "district": "Wardha",
+  "lat": 20.9362,
+  "lng": 78.2892,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pulgaon",
+  "district": "Wardha",
+  "lat": 20.7258,
+  "lng": 78.3176,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Wani",
+  "district": "Yavatmal",
+  "lat": 20.0574,
+  "lng": 78.9565,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Pandharkawada",
+  "district": "Yavatmal",
+  "lat": 20.0231,
+  "lng": 78.5477,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Darwha",
+  "district": "Yavatmal",
+  "lat": 20.3249,
+  "lng": 77.7779,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Digras",
+  "district": "Yavatmal",
+  "lat": 20.0968,
+  "lng": 77.7628,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Umarkhed",
+  "district": "Yavatmal",
+  "lat": 19.5982,
+  "lng": 77.9141,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ghatanji",
+  "district": "Yavatmal",
+  "lat": 20.0194,
+  "lng": 78.2747,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Warora",
+  "district": "Chandrapur",
+  "lat": 20.2343,
+  "lng": 79.0028,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Bhadravati",
+  "district": "Chandrapur",
+  "lat": 20.1065,
+  "lng": 79.1157,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Ballarpur",
+  "district": "Chandrapur",
+  "lat": 19.8568,
+  "lng": 79.348,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Brahmapuri",
+  "district": "Chandrapur",
+  "lat": 20.5185,
+  "lng": 79.866,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Rajura",
+  "district": "Chandrapur",
+  "lat": 19.7793,
+  "lng": 79.3657,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Armori",
+  "district": "Gadchiroli",
+  "lat": 20.4711,
+  "lng": 79.9795,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Aheri",
+  "district": "Gadchiroli",
+  "lat": 19.4132,
+  "lng": 80.004,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Tumsar",
+  "district": "Bhandara",
+  "lat": 21.382,
+  "lng": 79.75,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Sakoli",
+  "district": "Bhandara",
+  "lat": 21.0874,
+  "lng": 79.9974,
+  "tier": 3,
+  "aliases": []
+ },
+ {
+  "name": "Tirora",
+  "district": "Gondia",
+  "lat": 21.414,
+  "lng": 79.9166,
+  "tier": 3,
+  "aliases": []
+ }
+]

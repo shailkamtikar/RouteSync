@@ -7,7 +7,7 @@ Usage:
     python scripts/gps_simulator.py --token <device token> --speed 20
 
 Options:
-    --api URL             API base URL (default http://127.0.0.1:8000)
+    --api URL             API base URL (default http://127.0.0.1:8010)
     --speed N             time multiplier: 20 means the trip runs 20 times faster (default 20)
     --interval S          seconds between position reports (default 2)
     --start F             start at this fraction of the route, 0..1 (default 0)
@@ -20,6 +20,7 @@ The token can also be given in the GPS_INGEST_TOKEN environment variable.
 """
 
 import argparse
+import itertools
 import json
 import math
 import os
@@ -46,7 +47,7 @@ class Route:
     def __init__(self, coordinates):
         self.coordinates = coordinates
         self.cumulative = [0.0]
-        for previous, current in zip(coordinates, coordinates[1:], strict=False):
+        for previous, current in itertools.pairwise(coordinates):
             self.cumulative.append(self.cumulative[-1] + haversine_m(previous, current))
         self.length = self.cumulative[-1]
 
@@ -100,7 +101,7 @@ def main() -> int:
         description="Simulated bus GPS for one RouteSync journey"
     )
     parser.add_argument("--token", default=os.environ.get("GPS_INGEST_TOKEN", ""))
-    parser.add_argument("--api", default="http://127.0.0.1:8000")
+    parser.add_argument("--api", default="http://127.0.0.1:8010")
     parser.add_argument("--speed", type=float, default=20.0)
     parser.add_argument("--interval", type=float, default=2.0)
     parser.add_argument("--start", type=float, default=0.0)

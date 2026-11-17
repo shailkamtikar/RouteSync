@@ -1,37 +1,39 @@
 "use client";
 
+import { Check, Clock, Gauge, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { authedRequest } from "@/lib/api";
 import { describeError } from "@/lib/errors";
-import type { MapRoute, MapStop } from "@/lib/mapData";
+import { ROUTE_COLORS, type MapRoute, type MapStop } from "@/lib/mapData";
+import { formatDuration, km } from "@/lib/time";
+import type { Journey, RouteStop, RouteTemplate } from "@/lib/types";
 import { useResource } from "@/lib/useResource";
 
-import type { Journey } from "./JourneysPanel";
+import { useToast } from "./kit/Toast";
 import { RouteMap } from "./map/RouteMap";
-import type { RouteStop, RouteTemplate } from "./RouteOptionsPanel";
 import ui from "./ui.module.css";
+import styles from "./journeys/route.module.css";
 
-/** Lets the operator choose which route option a draft journey follows. */
+/** Shows the route a journey follows and, while it is a draft, lets the operator choose another. */
 export function JourneyRoutePanel({ journey, onChanged }: { journey: Journey; onChanged: () => void }) {
+  const toast = useToast();
   const templates = useResource<RouteTemplate[]>(
     `/api/v1/services/${journey.service_id}/route-templates?include_archived=true`,
   );
   const stops = useResource<RouteStop[]>(
     journey.route_template_id ? `/api/v1/route-templates/${journey.route_template_id}/stops` : null,
   );
-  const [choice, setChoice] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
   const current = templates.data?.find((template) => template.id === journey.route_template_id);
   const selectable = (templates.data ?? []).filter((template) => template.status === "ready");
   const isDraft = journey.status === "draft";
 
   const mapRoutes: MapRoute[] = useMemo(
-    () =>
-      current ? [{ id: current.id, name: current.name, coordinates: current.coordinates }] : [],
+    () => (current ? [{ id: current.id, name: current.name, coordinates: current.coordinates, color: ROUTE_COLORS[0] }] : []),
     [current],
   );
   const mapStops: MapStop[] = useMemo(
@@ -41,71 +43,104 @@ export function JourneyRoutePanel({ journey, onChanged }: { journey: Journey; on
         name: stop.name,
         lng: stop.location.lng,
         lat: stop.location.lat,
-        kind: stop.kind === "pass_through" ? "pass_through" : "suggested",
+        kind: stop.kind === "pass_through" ? "pass_through" : "active",
+        role: stop.role,
       })),
     [stops.data],
   );
 
-  async function apply() {
-    if (!choice) return;
-    setBusy(true);
+  async function choose(template: RouteTemplate) {
+    if (template.id === journey.route_template_id) return;
+    setBusy(template.id);
     setError(null);
     try {
       await authedRequest(`/api/v1/journeys/${journey.id}/route-template`, "PUT", {
-        route_template_id: choice,
+        route_template_id: template.id,
       });
-      setChoice("");
+      toast.success(`Following “${template.name}”.`);
       onChanged();
     } catch (reason) {
       setError(describeError(reason));
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
   return (
     <section className={ui.stack} aria-label="Route">
-      <h2>Route</h2>
-      <p data-testid="journey-route">
+      <div className={ui.spread}>
+        <h2 className={ui.sectionTitle}>Route</h2>
+        <Link href={`/dashboard/services/${journey.service_id}`} className={ui.link}>
+          Manage route options
+        </Link>
+      </div>
+      <p className={ui.muted} data-testid="journey-route">
         {current ? (
           <>
             Following <strong>{current.name}</strong>
-            {current.distance_m !== null && ` (${(current.distance_m / 1000).toFixed(0)} km)`}
+            {current.distance_m !== null && ` (${km(current.distance_m)})`}
           </>
         ) : (
           "No route option chosen yet."
         )}
       </p>
-      {isDraft && (
-        <div className={ui.row}>
-          <label className={ui.field}>
-            Route option
-            <select value={choice} onChange={(event) => setChoice(event.target.value)}>
-              <option value="">Choose…</option>
-              {selectable
-                .filter((template) => template.id !== journey.route_template_id)
-                .map((template) => (
-                  <option key={template.id} value={template.id}>
-                    {template.name}
-                  </option>
-                ))}
-            </select>
-          </label>
-          <button className={ui.button} type="button" disabled={busy || !choice} onClick={apply}>
-            Use this route
-          </button>
-          <Link href={`/dashboard/services/${journey.service_id}`}>Manage route options</Link>
-        </div>
+
+      {isDraft && selectable.length > 0 && (
+        <ul className={styles.options} aria-label="Route options" role="radiogroup">
+          {selectable.map((template, index) => {
+            const active = template.id === journey.route_template_id;
+            return (
+              <li key={template.id}>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  className={`${styles.option} ${active ? styles.optionActive : ""}`}
+                  style={{ ["--accent" as string]: ROUTE_COLORS[index % ROUTE_COLORS.length] }}
+                  disabled={busy !== null}
+                  onClick={() => choose(template)}
+                >
+                  <span className={styles.radio} aria-hidden>
+                    {active && <Check size={13} />}
+                  </span>
+                  <span className={styles.text}>
+                    <strong>{template.name}</strong>
+                    <span className={styles.metrics}>
+                      <span>
+                        <Gauge size={14} aria-hidden /> {km(template.distance_m)}
+                      </span>
+                      <span>
+                        <Clock size={14} aria-hidden /> {template.duration_s ? formatDuration(template.duration_s) : "—"}
+                      </span>
+                      <span>
+                        <MapPin size={14} aria-hidden /> {template.stop_count} stops
+                      </span>
+                    </span>
+                  </span>
+                  {busy === template.id && <span className={ui.small}>Applying…</span>}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {isDraft && selectable.length === 0 && !templates.loading && (
+        <p className={`${ui.notice} ${ui.noticeWarn}`}>
+          This service has no ready route option yet.{" "}
+          <Link href={`/dashboard/services/${journey.service_id}`} className={ui.link}>
+            Add one
+          </Link>
+        </p>
       )}
       {isDraft && journey.route_template_id && (
-        <p className={ui.muted}>Changing the route option clears the confirmed stops.</p>
+        <p className={ui.hint}>Choosing a different route option clears the confirmed stops.</p>
       )}
       {(error ?? templates.error) && (
-        <p className={ui.error} data-testid="route-error">
+        <p className={ui.error} role="alert" data-testid="route-error">
           {error ?? templates.error}
         </p>
       )}
-      {current && <RouteMap key={current.id} routes={mapRoutes} stops={mapStops} height={340} />}
+      {current && <RouteMap key={current.id} routes={mapRoutes} stops={mapStops} height={380} />}
     </section>
   );
 }

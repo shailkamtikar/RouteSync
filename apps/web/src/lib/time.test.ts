@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatClock, formatDuration, formatInZone, zonedInputToIso } from "./time";
+import { formatClock, formatDay, formatDuration, formatInZone, km, zonedInputToIso } from "./time";
 
 describe("time helpers", () => {
   it("converts an India wall-clock time to UTC", () => {
@@ -30,5 +30,30 @@ describe("time helpers", () => {
     expect(formatDuration(7500)).toBe("2 h 05 min");
     expect(formatDuration(300)).toBe("5 min");
     expect(formatDuration(-5)).toBe("0 min");
+  });
+});
+
+describe("formatDay and km", () => {
+  const now = new Date("2026-11-17T10:00:00Z"); // 15:30 on 17 Nov in India
+
+  it("says today, tomorrow and yesterday in the journey's zone", () => {
+    expect(formatDay("2026-11-17T12:30:00Z", "Asia/Kolkata", now)).toBe("Today 18:00");
+    expect(formatDay("2026-11-18T01:00:00Z", "Asia/Kolkata", now)).toBe("Tomorrow 06:30");
+    expect(formatDay("2026-11-16T16:00:00Z", "Asia/Kolkata", now)).toBe("Yesterday 21:30");
+  });
+
+  it("uses the date for other days", () => {
+    expect(formatDay("2026-11-25T03:30:00Z", "Asia/Kolkata", now)).toBe("25 Nov, 09:00");
+  });
+
+  it("decides the day in the zone, not in UTC", () => {
+    // 20:00 UTC on the 17th is already 01:30 on the 18th in India.
+    expect(formatDay("2026-11-17T20:00:00Z", "Asia/Kolkata", now)).toBe("Tomorrow 01:30");
+  });
+
+  it("rounds kilometres and handles a missing distance", () => {
+    expect(km(458_400)).toBe("458 km");
+    expect(km(null)).toBe("—");
+    expect(km(undefined)).toBe("—");
   });
 });

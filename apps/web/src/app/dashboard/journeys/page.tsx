@@ -1,10 +1,14 @@
-import { JourneysPanel } from "@/components/JourneysPanel";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+
+import { JourneysPanel } from "@/components/journeys/JourneysPanel";
+
+export const metadata: Metadata = { title: "Journeys" };
 
 export default function JourneysPage() {
   return (
-    <>
-      <h1>Journeys</h1>
+    <Suspense fallback={<p role="status">Loading…</p>}>
       <JourneysPanel />
-    </>
+    </Suspense>
   );
 }

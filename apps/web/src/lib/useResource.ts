@@ -29,5 +29,5 @@ export function useResource<T>(path: string | null) {
   }, [path, version]);
 
   const reload = useCallback(() => setVersion((value) => value + 1), []);
-  return { data, error, reload, loading: data === null && error === null };
+  return { data, error, reload, loading: path !== null && data === null && error === null };
 }

@@ -18,9 +18,9 @@ export default defineConfig({
   use: { baseURL: "http://localhost:3000", trace: "retain-on-failure" },
   webServer: [
     {
-      command: `${python} -m uvicorn app.main:app --port 8000`,
+      command: `${python} -m uvicorn app.main:app --port 8010`,
       cwd: path.resolve(__dirname, "../api"),
-      url: "http://127.0.0.1:8000/healthz",
+      url: "http://127.0.0.1:8010/healthz",
       reuseExistingServer: true,
       timeout: 60_000,
     },

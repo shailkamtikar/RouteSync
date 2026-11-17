@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { API, createDemoJourney, gpsPoint } from "./demo";
+import { API, createDemoJourney, onRoute } from "./demo";
 
 // These tests call the real assistant model through the API (one question each).
 test("a passenger asks the assistant about the journey", async ({ page, request }) => {
@@ -8,7 +8,7 @@ test("a passenger asks the assistant about the journey", async ({ page, request 
   const demo = createDemoJourney("boarding");
   await request.post(`${API}/api/v1/ingest/gps`, {
     headers: { Authorization: `Bearer ${demo.device_token}` },
-    data: { points: [gpsPoint(19.0948, 74.7496)] },
+    data: { points: [onRoute(demo, 25)] },
   });
   await page.goto(demo.tracking_url!);
   const companion = page.getByTestId("companion");

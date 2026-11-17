@@ -1,9 +1,10 @@
 .frame {
   position: relative;
   width: 100%;
-  border: 1px solid #8883;
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   overflow: hidden;
+  background: var(--surface-2);
 }
 
 .map {
@@ -17,22 +18,46 @@
   justify-content: center;
   padding: 16px;
   text-align: center;
-  border: 1px dashed #8886;
-  border-radius: 10px;
-  opacity: 0.8;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  background: var(--surface-2);
 }
 
 .bus {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #dc2626;
-  border: 3px solid #ffffff;
-  box-shadow: 0 0 0 2px #dc2626, 0 2px 6px #0006;
+  --bus: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
 }
 
-.busStale {
+.busIcon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bus);
+  color: #fff;
+  border: 3px solid #fff;
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 35%),
+    0 0 0 4px color-mix(in srgb, var(--bus) 28%, transparent);
+}
+
+.busLabel {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: #111827;
+  font: 600 11px/1.5 system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 28%);
+  white-space: nowrap;
+}
+
+.busStale .busIcon {
   background: #9ca3af;
-  box-shadow: 0 0 0 2px #9ca3af, 0 2px 6px #0006;
-  opacity: 0.85;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 30%);
+  opacity: 0.9;
 }

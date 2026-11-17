@@ -1,0 +1,273 @@
+.statusText {
+  display: inline-flex;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--ok-soft);
+  color: var(--ok);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.alerts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alerts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 550;
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+.alerts li[data-severity="warning"] {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.alerts li[data-severity="critical"],
+.alerts li[data-severity="error"] {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.kpiLate {
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
+}
+
+.kpiLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.kpiBig {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.kpiValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.kpiValue small {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.kpiSub {
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+.okText {
+  color: var(--ok);
+}
+
+.warnText {
+  color: var(--warn);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.mapCol {
+  position: sticky;
+  top: 16px;
+  height: min(640px, calc(100vh - 40px));
+  min-height: 420px;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.stops {
+  list-style: none;
+}
+
+.stops li {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding-bottom: 18px;
+}
+
+.stops li:last-child {
+  padding-bottom: 0;
+}
+
+.stops li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 20px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-strong);
+}
+
+.stops li[data-status="departed"]:not(:last-child)::before {
+  background: var(--brand);
+}
+
+.node {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: 50%;
+  border: 3px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--brand-contrast);
+}
+
+.stops li[data-status="arrived"] .node {
+  border-color: var(--ok);
+  box-shadow: 0 0 0 4px var(--ok-soft);
+}
+
+.stops li[data-status="departed"] .node {
+  border-color: var(--brand);
+  background: var(--brand);
+}
+
+.stops li[data-status="pending"] .node {
+  border-color: var(--brand);
+}
+
+.stopBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.stopBody small {
+  color: var(--text-3);
+  font-size: 0.8rem;
+}
+
+.stopBody > button {
+  align-self: flex-start;
+}
+
+.recordRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.decisions,
+.incidents {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.decisions li {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.decisions time {
+  flex: none;
+  width: 48px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.incidents li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mapCol {
+    position: static;
+    height: 420px;
+  }
+}

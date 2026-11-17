@@ -32,7 +32,6 @@ type StopPlan = {
 };
 type Issue = { code: string; severity: "error" | "warning"; message: string };
 type Validation = { valid: boolean; issues: Issue[] };
-type Transitions = { status: string; allowed: string[] };
 type RouteVersion = {
   id: string;
   version: number;
@@ -45,16 +44,6 @@ type RouteVersion = {
 };
 type Draft = Record<string, { active: boolean; pickup: number; drop: number; dwell: number }>;
 
-const ACTION_LABELS: Record<string, string> = {
-  awaiting_confirmation: "Submit plan for confirmation",
-  draft: "Reopen for editing",
-  published: "Publish",
-  boarding: "Start boarding",
-  in_progress: "Mark departed",
-  completed: "Mark completed",
-  disrupted: "Mark disrupted",
-  cancelled: "Cancel journey",
-};
 
 function toDraft(stops: PlanStop[]): Draft {
   return Object.fromEntries(
@@ -76,7 +65,6 @@ export function JourneyPlanPanel({ journey, onChanged }: { journey: Journey; onC
   // Reload whenever the journey itself changes (bookings, route option, status).
   const stamp = `${journey.status}|${journey.route_template_id}|${journey.booked_passengers}`;
   const plan = useResource<StopPlan>(`${base}/stop-plan?v=${encodeURIComponent(stamp)}`);
-  const transitions = useResource<Transitions>(`${base}/transitions?v=${encodeURIComponent(stamp)}`);
   const versions = useResource<RouteVersion[]>(`${base}/route-versions?v=${encodeURIComponent(stamp)}`);
   // Local edits on top of the server state; cleared whenever the plan is saved or reloaded.
   const [edits, setEdits] = useState<Draft>({});
@@ -108,7 +96,6 @@ export function JourneyPlanPanel({ journey, onChanged }: { journey: Journey; onC
   function refresh() {
     setEdits({});
     plan.reload();
-    transitions.reload();
     versions.reload();
     onChanged();
   }
@@ -132,25 +119,18 @@ export function JourneyPlanPanel({ journey, onChanged }: { journey: Journey; onC
   const checkPlan = () =>
     run(async () => setValidation(await authedRequest<Validation>(`${base}/validate`, "POST")));
 
-  const act = (path: string, body?: unknown) =>
-    run(async () => {
-      await authedRequest(`${base}/${path}`, "POST", body);
-      setValidation(null);
-      refresh();
-    });
-
   function update(id: string, patch: Partial<Draft[string]>) {
     setEdits((current) => ({ ...current, [id]: { ...draft[id], ...patch } }));
   }
 
   const editable = plan.data?.editable ?? false;
-  const loadError = plan.error ?? transitions.error ?? versions.error;
+  const loadError = plan.error ?? versions.error;
 
   return (
     <section className={ui.stack} aria-label="Stop plan">
-      <h2>Stops and plan</h2>
+      <h2 className={ui.sectionTitle}>Stops and plan</h2>
       {!journey.route_template_id && (
-        <p className={ui.muted}>Choose a route option above to see its stops.</p>
+        <p className={ui.notice}>Choose a route option above to see its stops.</p>
       )}
 
       {plan.data && plan.data.unresolved_bookings.length > 0 && (
@@ -245,24 +225,6 @@ export function JourneyPlanPanel({ journey, onChanged }: { journey: Journey; onC
             Check plan
           </button>
         )}
-        {journey.status === "awaiting_confirmation" && (
-          <button className={ui.button} type="button" disabled={busy} onClick={() => act("assign")}>
-            Assign route
-          </button>
-        )}
-        {transitions.data?.allowed
-          .filter((to) => to !== "ready")
-          .map((to) => (
-            <button
-              key={to}
-              className={to === "cancelled" ? ui.buttonDanger : ui.buttonGhost}
-              type="button"
-              disabled={busy}
-              onClick={() => act("transition", { to })}
-            >
-              {ACTION_LABELS[to] ?? to}
-            </button>
-          ))}
       </div>
 
       {(error ?? loadError) && (

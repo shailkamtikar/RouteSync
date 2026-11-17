@@ -154,12 +154,26 @@ def remove_bus(conn: psycopg.Connection, ctx: OperatorContext, bus_id: uuid.UUID
 
 
 def list_services(conn: psycopg.Connection, ctx: OperatorContext, include_archived: bool) -> list:
-    query = f"select {SERVICE_COLUMNS} from public.services where operator_id = %s"
+    """Services with a small summary of their route options and journeys for the overview."""
+    query = (
+        f"select {SERVICE_COLUMNS}, "
+        "  (select count(*) from public.route_templates t where t.service_id = s.id "
+        "     and t.operator_id = s.operator_id and t.status <> 'archived') as route_count, "
+        "  (select min(t.distance_m) from public.route_templates t where t.service_id = s.id "
+        "     and t.operator_id = s.operator_id and t.status = 'ready') as shortest_m, "
+        "  (select max(t.distance_m) from public.route_templates t where t.service_id = s.id "
+        "     and t.operator_id = s.operator_id and t.status = 'ready') as longest_m, "
+        "  (select count(*) from public.journeys j where j.service_id = s.id "
+        "     and j.operator_id = s.operator_id "
+        "     and j.status in ('published', 'ready', 'boarding', 'in_progress', 'disrupted')) "
+        "     as active_journeys "
+        "from public.services s where s.operator_id = %s"
+    )
     if not include_archived:
-        query += " and status = 'active'"
+        query += " and s.status = 'active'"
     with conn.cursor(row_factory=dict_row) as cur:
         rows = cur.execute(
-            query + " order by origin_name, destination_name", (ctx.operator_id,)
+            query + " order by s.origin_name, s.destination_name", (ctx.operator_id,)
         ).fetchall()
     return [_service_row(row) for row in rows]
 

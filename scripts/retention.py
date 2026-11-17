@@ -32,10 +32,14 @@ def main() -> None:
         ).fetchone()
         if args.dry_run:
             conn.rollback()
-            print(f"dry run: would remove {gps} positions, {snapshots} snapshots, {passengers} passenger records")
+            print(
+                f"dry run: would remove {gps} positions, {snapshots} snapshots, {passengers} passenger records"
+            )
         else:
             conn.commit()
-            print(f"removed {gps} positions, {snapshots} snapshots, {passengers} passenger records")
+            print(
+                f"removed {gps} positions, {snapshots} snapshots, {passengers} passenger records"
+            )
 
 
 if __name__ == "__main__":

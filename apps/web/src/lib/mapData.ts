@@ -20,11 +20,12 @@ export type MapStop = {
   lat: number;
   kind: MapStopKind;
   status?: "completed" | "next" | "upcoming";
+  role?: "origin" | "intermediate" | "destination";
 };
 
 export type MapBus = { lng: number; lat: number; stale: boolean };
 
-export const ROUTE_COLORS = ["#1f6feb", "#d97706", "#7c3aed", "#0f766e"];
+export const ROUTE_COLORS = ["#4f46e5", "#d97706", "#0d9488", "#db2777", "#2563eb", "#7c3aed"];
 export const PASS_THROUGH_LABEL = "No passenger stop";
 
 function isValid([lng, lat]: LngLat): boolean {
@@ -61,6 +62,7 @@ export function stopFeatures(stops: MapStop[]) {
           id: stop.id,
           kind: stop.kind,
           status: stop.status ?? "upcoming",
+          role: stop.role ?? "intermediate",
           // A pass-through town is never presented as a passenger stop.
           label: stop.kind === "pass_through" ? `${stop.name}\n${PASS_THROUGH_LABEL}` : stop.name,
         },

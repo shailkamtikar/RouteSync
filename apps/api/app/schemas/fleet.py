@@ -114,6 +114,11 @@ class ServiceOut(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+    # Summary shown on the services overview; zero or empty when a service has no routes yet.
+    route_count: int = 0
+    shortest_m: float | None = None
+    longest_m: float | None = None
+    active_journeys: int = 0
 
 
 class RemovalResult(BaseModel):

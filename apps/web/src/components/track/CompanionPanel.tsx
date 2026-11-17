@@ -1,5 +1,6 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { apiGet, ApiError, API_BASE_URL } from "@/lib/api";
@@ -46,7 +47,7 @@ export function CompanionPanel({ token, view }: { token: string; view: PublicVie
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const bottom = useRef<HTMLDivElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -59,7 +60,9 @@ export function CompanionPanel({ token, view }: { token: string; view: PublicVie
   }, [token]);
 
   useEffect(() => {
-    bottom.current?.scrollIntoView?.({ block: "nearest" });
+    // Keep the newest message in view inside the chat box only; never scroll the page itself.
+    const log = logRef.current;
+    if (log && turns.length > 0) log.scrollTop = log.scrollHeight;
   }, [turns]);
 
   async function send(question: string) {
@@ -104,10 +107,17 @@ export function CompanionPanel({ token, view }: { token: string; view: PublicVie
   if (enabled === false) return null;
   return (
     <section className={styles.panel} aria-label="RouteSync Companion" data-testid="companion">
-      <h2 className={styles.title}>Ask about this journey</h2>
-      <p className={styles.hint}>
-        Answers come from this journey&apos;s live data. General advice is marked as such. For booking changes, contact the operator.
-      </p>
+      <div className={styles.head}>
+        <span className={styles.avatar}>
+          <Sparkles size={20} aria-hidden />
+        </span>
+        <div>
+          <h2 className={styles.title}>Ask about this journey</h2>
+          <p className={styles.hint}>
+            Answers come from this journey&apos;s live data. General advice is marked as such. For booking changes, contact the operator.
+          </p>
+        </div>
+      </div>
       <div className={styles.chips}>
         {chipsFor(view).map((chip) => (
           <button key={chip} type="button" className={styles.chip} disabled={busy || enabled === null} onClick={() => send(chip)}>
@@ -115,7 +125,7 @@ export function CompanionPanel({ token, view }: { token: string; view: PublicVie
           </button>
         ))}
       </div>
-      <div className={styles.log} role="log" aria-live="polite" data-testid="companion-log">
+      <div ref={logRef} className={styles.log} role="log" aria-live="polite" data-testid="companion-log">
         {turns.map((turn, index) => (
           <div key={index} className={turn.role === "user" ? styles.user : styles.assistant}>
             <div className={styles.bubble}>{turn.text}</div>
@@ -128,7 +138,6 @@ export function CompanionPanel({ token, view }: { token: string; view: PublicVie
           </div>
         ))}
         {busy && <div className={styles.assistant}><div className={styles.bubble}>Checking…</div></div>}
-        <div ref={bottom} />
       </div>
       {error && (
         <p className={styles.error} role="alert" data-testid="companion-error">

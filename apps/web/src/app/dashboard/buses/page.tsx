@@ -1,10 +1,9 @@
-import { BusesPanel } from "@/components/BusesPanel";
+import type { Metadata } from "next";
+
+import { BusesPanel } from "@/components/buses/BusesPanel";
+
+export const metadata: Metadata = { title: "Buses" };
 
 export default function BusesPage() {
-  return (
-    <>
-      <h1>Buses</h1>
-      <BusesPanel />
-    </>
-  );
+  return <BusesPanel />;
 }

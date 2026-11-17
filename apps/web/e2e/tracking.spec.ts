@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { API, createDemoJourney, gpsPoint } from "./demo";
-import { signInAndWait, USERS } from "./helpers";
+import { API, createDemoJourney, onRoute } from "./demo";
+import { dialog, signInAndWait, stopItem, USERS } from "./helpers";
 
 test("passengers follow a journey on the public page", async ({ page, request, context }) => {
   test.setTimeout(300_000);
@@ -28,16 +28,15 @@ test("passengers follow a journey on the public page", async ({ page, request, c
 
   // The bus departs: operator records Pune, device sends a fresh position.
   const operator = await context.newPage();
-  await signInAndWait(operator, USERS.owner1);
+  await signInAndWait(operator, USERS.owner2);
   await operator.goto(demo.monitor_url);
-  const events = operator.getByRole("table", { name: "Stop events" });
-  const pune = events.getByRole("row", { name: /Pune/ });
+  const pune = stopItem(operator, "Pune");
   await pune.getByRole("button", { name: "Arrived" }).click();
   await pune.getByRole("button", { name: "Departed" }).click();
-  await expect(operator.getByTestId("monitor-status")).toHaveText("in progress");
+  await expect(operator.getByTestId("monitor-status")).toContainText("In progress");
   const sent = await request.post(`${API}/api/v1/ingest/gps`, {
     headers: device,
-    data: { points: [gpsPoint(19.0948, 74.7496)] },
+    data: { points: [onRoute(demo, 25)] },
   });
   expect(sent.status()).toBe(202);
 
@@ -46,12 +45,13 @@ test("passengers follow a journey on the public page", async ({ page, request, c
   await expect(page.getByTestId("stale-banner")).toHaveCount(0, { timeout: 25_000 });
   await expect(timeline.locator("li[data-status='completed']")).toHaveCount(1);
   await expect(timeline.locator("li[data-status='next']")).toContainText("Beed");
-  await expect(page.getByRole("img", { name: "Bus" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Bus", exact: true })).toBeVisible();
   await expect(page.getByTestId("progress")).toContainText("remaining");
 
   // Counts are hidden until the operator allows them.
   await expect(page.getByText(/boarding, .* alighting/)).toHaveCount(0);
   await operator.goto(`/dashboard/journeys/${demo.journey_id}`);
+  await operator.getByRole("tab", { name: "Passenger link" }).click();
   await operator.getByLabel("Show passenger counts on the public page").click();
   await expect(operator.getByLabel("Show passenger counts on the public page")).toBeChecked();
   await page.reload();
@@ -59,6 +59,7 @@ test("passengers follow a journey on the public page", async ({ page, request, c
 
   // The link is revoked: the page says so and shows no journey data.
   await operator.getByRole("button", { name: "Revoke link" }).click();
+  await dialog(operator).getByRole("button", { name: "Revoke link" }).click();
   await expect(operator.getByTestId("link-status")).toHaveCount(0);
   await page.reload();
   await expect(page.getByTestId("link-unavailable")).toContainText("no longer active");

@@ -18,6 +18,7 @@ from app.providers.routing.base import (
 
 logger = logging.getLogger(__name__)
 
+SNAP_RADIUS_M = 900
 BASE_URL = "https://api.openrouteservice.org/v2/directions"
 ATTRIBUTION = "© openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors"
 ALTERNATIVES_WARNING = "alternatives_unavailable"
@@ -51,7 +52,12 @@ class OrsRoutingProvider:
     ) -> list[RouteResult]:
         validate_request(waypoints, profile, alternatives, self.max_waypoints)
         warnings: list[str] = []
-        body: dict = {"coordinates": [list(point) for point in waypoints], "instructions": True}
+        body: dict = {
+            "coordinates": [list(point) for point in waypoints],
+            "instructions": True,
+            # A town centre is not always on a road: allow a road up to 900 m away (a stop must be within 1 km).
+            "radiuses": [SNAP_RADIUS_M] * len(waypoints),
+        }
         if alternatives:
             if alternatives_allowed(waypoints):
                 body["alternative_routes"] = {

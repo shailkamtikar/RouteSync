@@ -1,5 +1,6 @@
 "use client";
 
+import { Info, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ageText, countdown, delayText, kilometres } from "@/lib/eta";
@@ -9,6 +10,7 @@ import { formatClock, formatDuration, formatInZone } from "@/lib/time";
 import { usePolling } from "@/lib/usePolling";
 
 import { RouteMap } from "../map/RouteMap";
+import { Logo } from "../shell/Logo";
 import { CompanionPanel } from "./CompanionPanel";
 import styles from "./tracking.module.css";
 
@@ -30,6 +32,7 @@ function EtaCard({
   nowMs,
   zone,
   testId,
+  hero = false,
 }: {
   label: string;
   name: string;
@@ -38,9 +41,10 @@ function EtaCard({
   nowMs: number;
   zone: string;
   testId: string;
+  hero?: boolean;
 }) {
   return (
-    <div className={styles.card} data-testid={testId}>
+    <div className={`${styles.card} ${hero ? styles.cardHero : ""}`} data-testid={testId}>
       <div className={styles.cardLabel}>{label}</div>
       <div className={styles.cardName}>{name}</div>
       <div className={styles.cardBig}>{countdown(eta, nowMs)}</div>
@@ -87,6 +91,9 @@ export function TrackingPage({ token }: { token: string }) {
         lng: stop.lng,
         lat: stop.lat,
         kind: "active" as const,
+        role: (stop.role === "origin" || stop.role === "destination"
+          ? stop.role
+          : "intermediate") as "origin" | "destination" | "intermediate",
         status:
           stop.status === "completed" ? ("completed" as const) : stop.status === "upcoming" ? ("upcoming" as const) : ("next" as const),
       })),
@@ -137,26 +144,37 @@ export function TrackingPage({ token }: { token: string }) {
   const staleOrMissing = !data.bus || data.bus.stale;
   const destinationStop = data.stops.find((stop) => stop.role === "destination");
   const destinationDone = finished || destinationStop?.status === "completed";
+  const live = !finished && !notStarted && !staleOrMissing && !error;
 
   return (
     <main className={styles.page}>
+      <div className={styles.brandBar}>
+        <span className={styles.brand}>
+          <Logo size={26} /> RouteSync
+        </span>
+        <span className={`${styles.liveDot} ${live ? "" : styles.liveDotOff}`}>{live ? "Live" : "Not live"}</span>
+      </div>
+
       <header className={styles.header}>
         <div className={styles.route}>
           {journey.origin_name} → {journey.destination_name}
         </div>
         <div className={styles.status} data-testid="journey-status">
-          {STATUS_TEXT[journey.status]}
-          {updatedAt && !error && <span className={styles.muted}> · updated {ageText((nowMs - updatedAt) / 1000)}</span>}
+          <span className={styles.statusChip} data-state={journey.status}>
+            {STATUS_TEXT[journey.status]}
+          </span>
+          {updatedAt && !error && <span className={styles.muted}>updated {ageText((nowMs - updatedAt) / 1000)}</span>}
         </div>
       </header>
 
       {error && (
         <p className={styles.notice} role="status" data-testid="reconnecting">
-          Connection lost. Showing the last update received.
+          <Info size={18} aria-hidden /> Connection lost. Showing the last update received.
         </p>
       )}
       {!finished && !notStarted && staleOrMissing && (
         <p className={styles.warning} role="status" data-testid="stale-banner">
+          <TriangleAlert size={18} aria-hidden />
           {data.bus
             ? `Location not live. The last position was received ${ageText(eta?.gps_age_s ?? null)}.`
             : "No live position has been received yet. Times are based on the plan."}
@@ -164,137 +182,157 @@ export function TrackingPage({ token }: { token: string }) {
       )}
       {notStarted && (
         <p className={styles.notice} role="status">
-          Departure planned for {formatInZone(journey.departure_at, zone)}. Times below are based on the plan.
+          <Info size={18} aria-hidden /> Departure planned for {formatInZone(journey.departure_at, zone)}. Times below are based on the plan.
         </p>
       )}
       {data.alerts.map((alert) => (
         <p key={alert.type} className={alert.severity === "critical" ? styles.warning : styles.notice} data-testid={`alert-${alert.type}`}>
+          {alert.severity === "critical" ? <TriangleAlert size={18} aria-hidden /> : <Info size={18} aria-hidden />}
           {alert.message}
         </p>
       ))}
 
-      {eta && !finished && (
-        <section className={styles.cards} aria-label="Arrival times">
-          <EtaCard
-            label={eta.flags.next_is_destination ? "Next: final destination" : "Next passenger stop"}
-            name={eta.next_stop.name}
-            eta={eta.next_stop.eta}
-            remainingM={eta.next_stop.remaining_m}
-            nowMs={nowMs}
-            zone={zone}
-            testId="next-stop-card"
-          />
-          <EtaCard
-            label="Final destination"
-            name={eta.destination.name}
-            eta={eta.destination.eta}
-            remainingM={eta.remaining_distance_m}
-            nowMs={nowMs}
-            zone={zone}
-            testId="destination-card"
-          />
-        </section>
-      )}
-      {finished && (
-        <section className={styles.card} data-testid="finished-card">
-          <div className={styles.cardName}>{STATUS_TEXT[journey.status]}</div>
-          {journey.status === "completed" && <div className={styles.cardMeta}>Thank you for travelling with us.</div>}
-        </section>
-      )}
+      <div className={styles.layout}>
+        <div className={styles.areaEta}>
+          {eta && !finished && (
+            <section className={styles.cards} aria-label="Arrival times">
+              <EtaCard
+                hero
+                label="Final destination"
+                name={eta.destination.name}
+                eta={eta.destination.eta}
+                remainingM={eta.remaining_distance_m}
+                nowMs={nowMs}
+                zone={zone}
+                testId="destination-card"
+              />
+              <EtaCard
+                label={eta.flags.next_is_destination ? "Next: final destination" : "Next passenger stop"}
+                name={eta.next_stop.name}
+                eta={eta.next_stop.eta}
+                remainingM={eta.next_stop.remaining_m}
+                nowMs={nowMs}
+                zone={zone}
+                testId="next-stop-card"
+              />
+            </section>
+          )}
+          {finished && (
+            <section className={styles.card} data-testid="finished-card">
+              <div className={styles.cardName}>{STATUS_TEXT[journey.status]}</div>
+              {journey.status === "completed" && <div className={styles.cardMeta}>Thank you for travelling with us.</div>}
+            </section>
+          )}
 
-      {eta?.commitment && !finished && (
-        <section className={styles.promise} data-testid="promise">
-          <div>
-            <span className={styles.muted}>Arrival promised at booking</span>
-            <strong> {formatInZone(eta.commitment.original_eta, zone)}</strong>
-          </div>
-          <div>
-            <span className={styles.muted}>Now expected</span>
-            <strong> {formatInZone(eta.commitment.predicted_eta, zone)}</strong>
-            <span className={eta.commitment.status === "on_time" ? styles.ok : styles.late}> · {delayText(eta.commitment)}</span>
-          </div>
-        </section>
-      )}
+          {eta?.commitment && !finished && (
+            <section className={styles.promise} data-testid="promise">
+              <div>
+                <span className={styles.muted}>Arrival promised at booking</span>
+                <strong> {formatInZone(eta.commitment.original_eta, zone)}</strong>
+              </div>
+              <div>
+                <span className={styles.muted}>Now expected</span>
+                <strong> {formatInZone(eta.commitment.predicted_eta, zone)}</strong>
+                <span className={eta.commitment.status === "on_time" ? styles.ok : styles.late}> · {delayText(eta.commitment)}</span>
+              </div>
+            </section>
+          )}
+        </div>
 
-      <RouteMap key={routeData?.version ?? 0} routes={mapRoutes} stops={mapStops} bus={bus} height={320} />
-
-      {eta && (
-        <section className={styles.progress} aria-label="Progress" data-testid="progress">
-          <div className={styles.bar}>
-            <div className={styles.fill} style={{ width: `${Math.min(100, Math.max(0, eta.progress_pct))}%` }} />
+        <div className={styles.areaMap}>
+          <div className={styles.mapBox}>
+            <RouteMap key={routeData?.version ?? 0} routes={mapRoutes} stops={mapStops} bus={bus} height="100%" label="Live bus map" />
           </div>
-          <div className={styles.progressRow}>
-            <span>{kilometres(eta.travelled_distance_m)} travelled</span>
-            <span>{notStarted ? "" : `${formatDuration(elapsed)} elapsed`}</span>
-            <span>{kilometres(eta.remaining_distance_m)} remaining</span>
-          </div>
-        </section>
-      )}
+          {eta && (
+            <section className={styles.progress} aria-label="Progress" data-testid="progress">
+              <div className={styles.bar}>
+                <div className={styles.fill} style={{ width: `${Math.min(100, Math.max(0, eta.progress_pct))}%` }} />
+              </div>
+              <div className={styles.progressRow}>
+                <span>{kilometres(eta.travelled_distance_m)} travelled</span>
+                <span>{notStarted ? "" : `${formatDuration(elapsed)} elapsed`}</span>
+                <span>{kilometres(eta.remaining_distance_m)} remaining</span>
+              </div>
+            </section>
+          )}
+        </div>
 
-      <section aria-label="Stops" className={styles.timeline}>
-        <h2>Stops on this journey</h2>
-        <ol className={styles.list} data-testid="timeline">
-          {data.stops.filter((stop) => stop.role !== "destination").map((stop) => (
-            <li key={stop.name} className={`${styles.item} ${styles[stop.status]}`} data-status={stop.status}>
+        <section aria-label="Stops" className={`${styles.timeline} ${styles.areaStops}`}>
+          <h2>Stops on this journey</h2>
+          <ol className={styles.list} data-testid="timeline">
+            {data.stops
+              .filter((stop) => stop.role !== "destination")
+              .map((stop) => (
+                <li
+                  key={stop.name}
+                  className={`${styles.item} ${styles[stop.status]}`}
+                  data-status={stop.status}
+                >
+                  <span className={styles.dot} aria-hidden="true" />
+                  <div>
+                    <div className={styles.stopName}>
+                      {stop.name}
+                      {stop.status === "next" && <span className={styles.tag}>next</span>}
+                      {stop.status === "current" && <span className={styles.tag}>here now</span>}
+                      {stop.status === "completed" && <span className={styles.tagDone}>done</span>}
+                    </div>
+                    <div className={styles.cardMeta}>
+                      {stop.status === "completed"
+                        ? "Completed"
+                        : stop.eta
+                          ? `Expected ${formatClock(stop.eta, zone)} · ${countdown(stop.eta, nowMs)}`
+                          : "Time not available"}
+                      {data.counts_enabled && stop.boarding_count !== undefined && (
+                        <>
+                          {" "}
+                          · {stop.boarding_count} boarding, {stop.alighting_count} alighting
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            <li
+              className={`${styles.item} ${styles.destinationItem} ${destinationDone ? styles.completed : ""}`}
+              data-status="destination"
+            >
               <span className={styles.dot} aria-hidden="true" />
               <div>
                 <div className={styles.stopName}>
-                  {stop.name}
-                  {stop.status === "next" && <span className={styles.tag}>next</span>}
-                  {stop.status === "current" && <span className={styles.tag}>here now</span>}
-                  {stop.status === "completed" && <span className={styles.tagDone}>done</span>}
+                  {journey.destination_name}
+                  {destinationDone && <span className={styles.tagDone}>done</span>}
                 </div>
                 <div className={styles.cardMeta}>
-                  {stop.status === "completed"
-                    ? "Completed"
-                    : stop.eta
-                      ? `Expected ${formatClock(stop.eta, zone)} · ${countdown(stop.eta, nowMs)}`
+                  {finished
+                    ? STATUS_TEXT[journey.status]
+                    : eta?.destination.eta
+                      ? `Expected ${formatClock(eta.destination.eta, zone)}`
                       : "Time not available"}
-                  {data.counts_enabled && stop.boarding_count !== undefined && (
-                    <> · {stop.boarding_count} boarding, {stop.alighting_count} alighting</>
+                  {data.counts_enabled && destinationStop?.alighting_count !== undefined && (
+                    <> · {destinationStop.alighting_count} alighting</>
                   )}
                 </div>
               </div>
             </li>
-          ))}
-          <li
-            className={`${styles.item} ${styles.destinationItem} ${destinationDone ? styles.completed : ""}`}
-            data-status="destination"
-          >
-            <span className={styles.dot} aria-hidden="true" />
-            <div>
-              <div className={styles.stopName}>
-                {journey.destination_name}
-                {destinationDone && <span className={styles.tagDone}>done</span>}
-              </div>
-              <div className={styles.cardMeta}>
-                {finished
-                  ? STATUS_TEXT[journey.status]
-                  : eta?.destination.eta
-                    ? `Expected ${formatClock(eta.destination.eta, zone)}`
-                    : "Time not available"}
-                {data.counts_enabled && destinationStop?.alighting_count !== undefined && (
-                  <> · {destinationStop.alighting_count} alighting</>
-                )}
-              </div>
-            </div>
-          </li>
-        </ol>
-        {data.pass_through.length > 0 && (
-          <p className={styles.muted} data-testid="pass-through-note">
-            Also on the road, with no passenger stop: {data.pass_through.map((p) => p.name).join(", ")}.
-          </p>
-        )}
-        {data.counts_enabled && data.onboard && (
-          <p className={styles.muted} data-testid="onboard-note">
-            {data.onboard.method === "recorded_events"
-              ? `${data.onboard.onboard} passengers on board (recorded).`
-              : "Passenger counts above are planned figures."}
-          </p>
-        )}
-      </section>
+          </ol>
+          {data.pass_through.length > 0 && (
+            <p className={styles.muted} data-testid="pass-through-note" style={{ marginTop: 14 }}>
+              Also on the road, with no passenger stop: {data.pass_through.map((p) => p.name).join(", ")}.
+            </p>
+          )}
+          {data.counts_enabled && data.onboard && (
+            <p className={styles.muted} data-testid="onboard-note" style={{ marginTop: 8 }}>
+              {data.onboard.method === "recorded_events"
+                ? `${data.onboard.onboard} passengers on board (recorded).`
+                : "Passenger counts above are planned figures."}
+            </p>
+          )}
+        </section>
 
-      <CompanionPanel token={token} view={data} />
+        <div className={styles.areaAsk}>
+          <CompanionPanel token={token} view={data} />
+        </div>
+      </div>
 
       <footer className={styles.footer}>
         Times are estimates and may change. Map data © OpenStreetMap contributors.
